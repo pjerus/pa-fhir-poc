@@ -40,8 +40,8 @@ function lcdFixture(overrides: Partial<LcdInput> = {}): LcdInput {
       { id: 'TEST-W-L1-R2', text: 'Requirement two', ordinal: 2, category: 'documentation' },
     ],
     coveredCodes: [
-      { system: 'TEST-W-HCPCS', code: 'TEST-W-E0607' },
-      { system: 'TEST-W-HCPCS', code: 'TEST-W-A4253' },
+      { system: 'TEST-W-HCPCS', code: 'TEST-W-E9819' },
+      { system: 'TEST-W-HCPCS', code: 'TEST-W-A9801' },
     ],
     ...overrides,
   };
@@ -54,8 +54,8 @@ function articleFixture(overrides: Partial<ArticleInput> = {}): ArticleInput {
     version: '1',
     sourceHash: 'TEST-W-hash-a1',
     listedCodes: [
-      { system: 'TEST-W-HCPCS', code: 'TEST-W-E0607' },
-      { system: 'TEST-W-HCPCS', code: 'TEST-W-A4253' },
+      { system: 'TEST-W-HCPCS', code: 'TEST-W-E9819' },
+      { system: 'TEST-W-HCPCS', code: 'TEST-W-A9801' },
     ],
     denialReasons: [
       { id: 'TEST-W-A1-D1', text: 'Denial reason one' },
@@ -196,9 +196,9 @@ test('loadSubgraph removes stale COVERS/LISTS/DEFINES edges when codes and denia
   await cleanupTestData();
   await loadSubgraph(graph, { lcd: lcdFixture(), article: articleFixture() });
 
-  const trimmedLcd = lcdFixture({ coveredCodes: [{ system: 'TEST-W-HCPCS', code: 'TEST-W-E0607' }] });
+  const trimmedLcd = lcdFixture({ coveredCodes: [{ system: 'TEST-W-HCPCS', code: 'TEST-W-E9819' }] });
   const trimmedArticle = articleFixture({
-    listedCodes: [{ system: 'TEST-W-HCPCS', code: 'TEST-W-E0607' }],
+    listedCodes: [{ system: 'TEST-W-HCPCS', code: 'TEST-W-E9819' }],
     denialReasons: [{ id: 'TEST-W-A1-D1', text: 'Denial reason one' }],
   });
   await loadSubgraph(graph, { lcd: trimmedLcd, article: trimmedArticle });
@@ -218,7 +218,7 @@ test('loadSubgraph removes stale COVERS/LISTS/DEFINES edges when codes and denia
   assert.equal(definesCount?.count, 1);
 
   // Dropped Code/DenialReason nodes are not deleted, only the edges to them.
-  const [orphanCode] = await graph.run(`MATCH (c:Code {system: 'TEST-W-HCPCS', code: 'TEST-W-A4253'}) RETURN c`);
+  const [orphanCode] = await graph.run(`MATCH (c:Code {system: 'TEST-W-HCPCS', code: 'TEST-W-A9801'}) RETURN c`);
   assert.ok(orphanCode, 'the orphaned Code node should still exist');
   const [orphanReason] = await graph.run(`MATCH (d:DenialReason {id: 'TEST-W-A1-D2'}) RETURN d`);
   assert.ok(orphanReason, 'the orphaned DenialReason node should still exist');

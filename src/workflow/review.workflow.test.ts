@@ -55,7 +55,7 @@ function lcdFixture(id: string): LcdInput {
     version: '1',
     sourceHash: `TEST-F-hash-${id}`,
     requirements: [{ id: `${id}-R1`, text: 'Requirement one', ordinal: 1, category: 'indication' }],
-    coveredCodes: [{ system: 'TEST-F-HCPCS', code: 'TEST-F-E0607' }],
+    coveredCodes: [{ system: 'TEST-F-HCPCS', code: 'TEST-F-E9819' }],
   };
 }
 

@@ -42,8 +42,8 @@ function lcdFixture(overrides: Partial<LcdInput> = {}): LcdInput {
       { id: 'TEST-R-L1-R1', text: 'Requirement one', ordinal: 1, category: 'indication' },
     ],
     coveredCodes: [
-      { system: 'TEST-R-HCPCS', code: 'TEST-R-E0607' },
-      { system: 'TEST-R-HCPCS', code: 'TEST-R-A4253' },
+      { system: 'TEST-R-HCPCS', code: 'TEST-R-E9819' },
+      { system: 'TEST-R-HCPCS', code: 'TEST-R-A9801' },
     ],
     ...overrides,
   };
@@ -55,7 +55,7 @@ function articleFixture(overrides: Partial<ArticleInput> = {}): ArticleInput {
     title: 'Test Article',
     version: '1',
     sourceHash: 'TEST-R-hash-a1',
-    listedCodes: [{ system: 'TEST-R-HCPCS', code: 'TEST-R-E0607' }],
+    listedCodes: [{ system: 'TEST-R-HCPCS', code: 'TEST-R-E9819' }],
     denialReasons: [{ id: 'TEST-R-A1-D1', text: 'Denial reason one' }],
     ...overrides,
   };
@@ -89,8 +89,8 @@ test('readApprovedSubgraph returns requirements ordered by ordinal, coveredCodes
 
   const sortedCodes = [...result.coveredCodes].sort((a, b) => a.code.localeCompare(b.code));
   assert.deepEqual(sortedCodes, [
-    { system: 'TEST-R-HCPCS', code: 'TEST-R-A4253' },
-    { system: 'TEST-R-HCPCS', code: 'TEST-R-E0607' },
+    { system: 'TEST-R-HCPCS', code: 'TEST-R-A9801' },
+    { system: 'TEST-R-HCPCS', code: 'TEST-R-E9819' },
   ]);
 
   assert.equal(result.article, undefined);
@@ -106,7 +106,7 @@ test('readApprovedSubgraph includes the article block when an article exists', a
   assert.ok(result.article, 'expected an article block');
   assert.equal(result.article?.id, 'TEST-R-A1');
   assert.equal(result.article?.sourceHash, 'TEST-R-hash-a1');
-  assert.deepEqual(result.article?.listedCodes, [{ system: 'TEST-R-HCPCS', code: 'TEST-R-E0607' }]);
+  assert.deepEqual(result.article?.listedCodes, [{ system: 'TEST-R-HCPCS', code: 'TEST-R-E9819' }]);
   assert.deepEqual(result.article?.denialReasons, [{ id: 'TEST-R-A1-D1', text: 'Denial reason one' }]);
 });
 

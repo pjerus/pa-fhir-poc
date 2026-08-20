@@ -54,7 +54,7 @@ function lcdFixture(overrides: Partial<LcdInput> = {}): LcdInput {
       { id: 'TEST-X-L1-R1', text: 'Requirement one', ordinal: 1, category: 'indication' },
       { id: 'TEST-X-L1-R2', text: 'Requirement two', ordinal: 2, category: 'documentation' },
     ],
-    coveredCodes: [{ system: 'TEST-X-HCPCS', code: 'TEST-X-E0607' }],
+    coveredCodes: [{ system: 'TEST-X-HCPCS', code: 'TEST-X-E9819' }],
     ...overrides,
   };
 }

@@ -66,8 +66,8 @@ function lcdFixture(overrides: Partial<LcdInput> = {}): LcdInput {
       { id: 'TEST-V-L1-R2', text: 'Requirement two', ordinal: 2, category: 'documentation' },
     ],
     coveredCodes: [
-      { system: 'TEST-V-HCPCS', code: 'TEST-V-E0607' },
-      { system: 'TEST-V-HCPCS', code: 'TEST-V-A4253' },
+      { system: 'TEST-V-HCPCS', code: 'TEST-V-E9819' },
+      { system: 'TEST-V-HCPCS', code: 'TEST-V-A9801' },
     ],
     ...overrides,
   };
@@ -80,8 +80,8 @@ function articleFixture(overrides: Partial<ArticleInput> = {}): ArticleInput {
     version: '1',
     sourceHash: 'TEST-V-hash-a1',
     listedCodes: [
-      { system: 'TEST-V-HCPCS', code: 'TEST-V-E0607' },
-      { system: 'TEST-V-HCPCS', code: 'TEST-V-A4253' },
+      { system: 'TEST-V-HCPCS', code: 'TEST-V-E9819' },
+      { system: 'TEST-V-HCPCS', code: 'TEST-V-A9801' },
     ],
     denialReasons: [
       { id: 'TEST-V-A1-D1', text: 'Denial reason one' },

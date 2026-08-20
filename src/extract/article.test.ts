@@ -29,8 +29,8 @@ function fullDocument(...extraLines: string[]): string {
     'General billing guidance appears here.',
     'Coding Information',
     'CPT/HCPCS Codes',
-    'E0607 Home blood glucose monitor',
-    'A4253 Blood glucose test strips',
+    'E9819 Home blood glucose monitor',
+    'A9801 Blood glucose test strips',
     'ICD-10-CM Codes that Support Medical',
     'Necessity',
     'E11.9 Type 2 diabetes mellitus without complications',
@@ -81,8 +81,8 @@ test('extractIcd10Codes: throws naming the heading when zero codes are found ben
 test('extractHcpcsCodes: bounded by the start of the ICD-10 support heading (itself split across two lines)', () => {
   const text = [
     'CPT/HCPCS Codes',
-    'E0607 Home blood glucose monitor',
-    'A4253 Blood glucose test strips',
+    'E9819 Home blood glucose monitor',
+    'A9801 Blood glucose test strips',
     'ICD-10-CM Codes that Support Medical',
     'Necessity',
     'B9999 should not be counted',
@@ -90,8 +90,8 @@ test('extractHcpcsCodes: bounded by the start of the ICD-10 support heading (its
 
   assert.deepEqual(extractHcpcsCodes(text), {
     codes: [
-      { system: 'HCPCS', code: 'E0607' },
-      { system: 'HCPCS', code: 'A4253' },
+      { system: 'HCPCS', code: 'E9819' },
+      { system: 'HCPCS', code: 'A9801' },
     ],
     warnings: [],
   });
@@ -106,7 +106,7 @@ test('extractHcpcsCodes: throws naming the heading when it is not found', () => 
 test('extractHcpcsCodes: falls back to the Coding Guidelines section when the primary region has zero codes', () => {
   const text = [
     'CODING GUIDELINES',
-    'For claims use code K0554 and code K0553 for the supply allowance.',
+    'For claims use code K9814 and code K9813 for the supply allowance.',
     'Coding Information',
     'CPT/HCPCS Codes',
     'N/A',
@@ -114,8 +114,8 @@ test('extractHcpcsCodes: falls back to the Coding Guidelines section when the pr
 
   assert.deepEqual(extractHcpcsCodes(text), {
     codes: [
-      { system: 'HCPCS', code: 'K0554' },
-      { system: 'HCPCS', code: 'K0553' },
+      { system: 'HCPCS', code: 'K9814' },
+      { system: 'HCPCS', code: 'K9813' },
     ],
     warnings: [],
   });
@@ -151,8 +151,8 @@ test('parseArticleText: assembles ICD-10/HCPCS codes and deterministic denial-re
     { system: 'ICD-10-CM', code: 'E11.65' },
   ]);
   assert.deepEqual(result.hcpcsCodes, [
-    { system: 'HCPCS', code: 'E0607' },
-    { system: 'HCPCS', code: 'A4253' },
+    { system: 'HCPCS', code: 'E9819' },
+    { system: 'HCPCS', code: 'A9801' },
   ]);
   assert.deepEqual(result.denialReasons, [
     {
@@ -173,8 +173,8 @@ test('parseArticleText: falls back to the whole text with a warning when no non-
     'General billing guidance appears here.',
     'Coding Information',
     'CPT/HCPCS Codes',
-    'E0607 Home blood glucose monitor',
-    'A4253 Blood glucose test strips',
+    'E9819 Home blood glucose monitor',
+    'A9801 Blood glucose test strips',
     'ICD-10-CM Codes that Support Medical',
     'Necessity',
     'E11.9 Type 2 diabetes mellitus without complications',
