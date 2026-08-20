@@ -1,22 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import type { LlmClient } from './llm-client.ts';
+import { fakeLlm } from '../../test/support/fake-llm.ts';
 import { structureRequirements } from './structure.ts';
-
-function fakeLlm(responses: readonly string[]): LlmClient & { readonly prompts: string[] } {
-  const queue = [...responses];
-  const prompts: string[] = [];
-  return {
-    prompts,
-    async complete(request) {
-      prompts.push(request.prompt);
-      const next = queue.shift();
-      if (next === undefined) throw new Error('fake LLM called more times than expected');
-      return next;
-    },
-  };
-}
 
 test('turns a model response into ordinal-numbered typed requirements', async () => {
   const llm = fakeLlm([
