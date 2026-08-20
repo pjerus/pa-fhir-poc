@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Read `PA-AI-POC-PLAN.md` in full before writing code — it is the authority on scope, milestone ordering, and the acceptance bar.
 
-**Current milestone: M1 built and green; M2 is next.** Keep this line current as milestones land; it is the fastest way for a fresh session to know where the build stands.
+**Current milestone: M1 built (acceptance gate pending real fixtures); M2's deterministic graph layer is merged — remaining for M2: the A52464 article extractor producing `fixtures/<id>.article.json` (shape = `ArticleInput`), and HCPCS code extraction (until then every LCD loads with `coveredCodes: []`). M3 (Temporal review) is otherwise next.** Keep this line current as milestones land; it is the fastest way for a fresh session to know where the build stands.
 
 **M1's acceptance gate has not run against a real LCD.** `test/acceptance.test.ts` discovers `fixtures/*.expected.json` and skips when there are none — so `npm test` is green without proving anything about a real coverage policy. The chain was proven end-to-end against the live model on a synthetic two-page PDF only. Placing `fixtures/L33822.pdf` plus a hand-authored `fixtures/L33822.expected.json` is what closes M1.
 
@@ -75,6 +75,7 @@ node --test --test-name-pattern 'combined'  # one test by name
 npx tsc --noEmit                            # typecheck (npm run typecheck)
 
 node cli.ts extract <lcd.pdf>               # M1, implemented: prints Requirement[], snapshots to fixtures/
+node cli.ts load <lcdId> [articleId]        # M2, implemented: snapshot -> graph upsert -> validation report (exit 1 if unclean)
 ```
 
 Not yet implemented — the interface the plan commits to:
@@ -82,7 +83,6 @@ Not yet implemented — the interface the plan commits to:
 ```bash
 docker compose up -d                        # neo4j (see "Neo4j" below)
 temporal server start-dev                   # temporal dev server
-node cli.ts load                            # M2: upsert subgraph + run validate report
 node cli.ts run <lcd.pdf> <article.pdf>     # M5: full chain; prints workflow id, then blocks on signal
 node cli.ts project <lcdId>                 # M4: emits out/<lcdId>.{crd,dtr,plandefinition}.json
 ```
