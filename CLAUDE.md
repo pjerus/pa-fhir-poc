@@ -6,9 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Read `PA-AI-POC-PLAN.md` in full before writing code — it is the authority on scope, milestone ordering, and the acceptance bar.
 
-**Current milestone: M1/M2/M3 core merged.** Remaining before M4: (a) M1 acceptance-gate closure on the real L33822 PDF — extraction works (31 requirements) but the section splitter double-attributes text on real MCD layout (revision-history INDICATION/LIMITATION table labels get treated as headings; PDF text layer quadruples some lines), producing one exact-duplicate requirement that M2's validator rightly flags — harden the splitter generically, re-extract, then author `fixtures/L33822.expected.json`; (b) M2 part 2 — A52464 article extractor producing `fixtures/<id>.article.json` (shape = `ArticleInput`) and HCPCS code extraction (until then every LCD loads with `coveredCodes: []`).
+**Current milestone: M1-M3 complete and verified on the real documents; M4 (FHIR projection) is next.** The graph holds approved L33822: 37 requirements, 20 covered HCPCS codes, 461 article-listed ICD-10 codes, 16 denial reasons — all via `node cli.ts load L33822 A52464` + the review workflow. M1's acceptance gate now runs the live model (~40s) inside `npm test`.
 
-M3 facts: the review workflow runs against the machine's shared Temporal at :7233, namespace `pa-fhir-poc` (env-driven; fresh clones use `temporal server start-dev` + `default`). Worker: `node src/workflow/worker.ts`. Review provenance lands on the LCD node as `lastReviewDecision`/`lastReviewer`/`lastReviewNote`. Keep this line current as milestones land; it is the fastest way for a fresh session to know where the build stands.
+M3 facts: the review workflow runs against the machine's shared Temporal at :7233, namespace `pa-fhir-poc` (env-driven; fresh clones use `temporal server start-dev` + `default`). Worker: `node src/workflow/worker.ts`. Review provenance lands on the LCD node as `lastReviewDecision`/`lastReviewer`/`lastReviewNote`.
 
 **M1's acceptance gate has not run against a real LCD.** `test/acceptance.test.ts` discovers `fixtures/*.expected.json` and skips when there are none — so `npm test` is green without proving anything about a real coverage policy. The chain was proven end-to-end against the live model on a synthetic two-page PDF only. Placing `fixtures/L33822.pdf` plus a hand-authored `fixtures/L33822.expected.json` is what closes M1.
 
@@ -81,6 +81,7 @@ node cli.ts load <lcdId> [articleId]        # M2, implemented: snapshot -> graph
 node src/workflow/worker.ts                 # M3, implemented: review worker (blocks; run in its own terminal)
 node cli.ts review-start <lcdId> [articleId]        # M3, implemented: starts review workflow, prints workflow id
 node cli.ts review-signal <wfId> <approve|reject> <reviewer> [note]   # M3, implemented
+node cli.ts extract-article <article.pdf>   # M2, implemented: ICD-10/HCPCS deterministic + denial reasons via LLM -> fixtures/<id>.article.json
 ```
 
 Not yet implemented — the interface the plan commits to:
