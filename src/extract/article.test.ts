@@ -33,8 +33,8 @@ function fullDocument(...extraLines: string[]): string {
     'A9801 Blood glucose test strips',
     'ICD-10-CM Codes that Support Medical',
     'Necessity',
-    'E11.9 Type 2 diabetes mellitus without complications',
-    'E11.65 Type 2 diabetes mellitus with hyperglycemia',
+    'E99.1 Type 2 diabetes mellitus without complications',
+    'E99.25 Type 2 diabetes mellitus with hyperglycemia',
     'ICD-10-CM Codes that DO NOT Support Medical Necessity',
     'Z79.4 Long term (current) use of insulin',
     ...extraLines,
@@ -48,15 +48,15 @@ test('extractIcd10Codes: spans a heading split across two lines, bounded by the 
     'Some preamble line.',
     'ICD-10-CM Codes that Support Medical',
     'Necessity',
-    'E11.9 Type 2 diabetes mellitus without complications',
-    'E11.65 Type 2 diabetes mellitus with hyperglycemia',
+    'E99.1 Type 2 diabetes mellitus without complications',
+    'E99.25 Type 2 diabetes mellitus with hyperglycemia',
     'ICD-10-CM Codes that DO NOT Support Medical Necessity',
     'Z79.4 Long term (current) use of insulin',
   ].join('\n');
 
   assert.deepEqual(extractIcd10Codes(text), [
-    { system: 'ICD-10-CM', code: 'E11.9' },
-    { system: 'ICD-10-CM', code: 'E11.65' },
+    { system: 'ICD-10-CM', code: 'E99.1' },
+    { system: 'ICD-10-CM', code: 'E99.25' },
   ]);
 });
 
@@ -147,8 +147,8 @@ test('parseArticleText: assembles ICD-10/HCPCS codes and deterministic denial-re
 
   assert.equal(result.id, ARTICLE_ID);
   assert.deepEqual(result.listedCodes, [
-    { system: 'ICD-10-CM', code: 'E11.9' },
-    { system: 'ICD-10-CM', code: 'E11.65' },
+    { system: 'ICD-10-CM', code: 'E99.1' },
+    { system: 'ICD-10-CM', code: 'E99.25' },
   ]);
   assert.deepEqual(result.hcpcsCodes, [
     { system: 'HCPCS', code: 'E9819' },
@@ -177,8 +177,8 @@ test('parseArticleText: falls back to the whole text with a warning when no non-
     'A9801 Blood glucose test strips',
     'ICD-10-CM Codes that Support Medical',
     'Necessity',
-    'E11.9 Type 2 diabetes mellitus without complications',
-    'E11.65 Type 2 diabetes mellitus with hyperglycemia',
+    'E99.1 Type 2 diabetes mellitus without complications',
+    'E99.25 Type 2 diabetes mellitus with hyperglycemia',
     'ICD-10-CM Codes that DO NOT Support Medical Necessity',
     'Z79.4 Long term (current) use of insulin',
   ].join('\n');
