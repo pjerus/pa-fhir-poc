@@ -12,6 +12,9 @@
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
 
+    "baseUrl": ".",
+    "paths": { "fhir/*": ["node_modules/@types/fhir/*.d.ts"] },
+
     "allowImportingTsExtensions": true,
     "erasableSyntaxOnly": true,
     "verbatimModuleSyntax": true,
