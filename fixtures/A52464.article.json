@@ -1,0 +1,1998 @@
+{
+  "id": "A52464",
+  "listedCodes": [
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.00"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.01"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.10"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.11"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.21"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.22"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.29"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.311"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.319"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3211"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3212"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3213"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3219"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3291"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3292"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3293"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3299"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3311"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3312"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3313"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3319"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3391"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3392"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3393"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3399"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3411"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3412"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3413"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3419"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3491"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3492"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3493"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3499"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3511"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3512"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3513"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3519"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3521"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3522"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3523"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3529"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3531"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3532"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3533"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3539"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3541"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3542"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3543"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3549"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3551"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3552"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3553"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3559"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3591"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3592"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3593"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.3599"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.36"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.37X1"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.37X2"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.37X3"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.37X9"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.39"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.40"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.41"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.42"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.43"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.44"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.49"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.51"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.52"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.59"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.610"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.618"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.620"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.621"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.622"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.628"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.630"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.638"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.641"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.649"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.65"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.69"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.8"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E08.9"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.00"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.01"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.10"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.11"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.21"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.22"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.29"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.311"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.319"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3211"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3212"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3213"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3219"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3291"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3292"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3293"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3299"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3311"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3312"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3313"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3319"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3391"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3392"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3393"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3399"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3411"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3412"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3413"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3419"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3491"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3492"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3493"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3499"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3511"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3512"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3513"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3519"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3521"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3522"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3523"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3529"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3531"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3532"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3533"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3539"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3541"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3542"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3543"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3549"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3551"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3552"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3553"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3559"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3591"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3592"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3593"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.3599"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.36"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.37X1"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.37X2"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.37X3"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.37X9"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.39"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.40"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.41"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.42"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.43"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.44"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.49"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.51"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.52"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.59"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.610"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.618"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.620"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.621"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.622"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.628"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.630"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.638"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.641"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.649"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.65"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.69"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.8"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E09.9"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.10"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.11"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.21"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.22"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.29"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.311"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.319"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3211"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3212"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3213"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3219"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3291"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3292"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3293"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3299"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3311"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3312"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3313"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3319"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3391"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3392"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3393"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3399"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3411"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3412"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3413"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3419"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3491"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3492"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3493"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3499"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3511"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3512"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3513"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3519"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3521"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3522"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3523"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3529"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3531"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3532"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3533"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3539"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3541"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3542"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3543"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3549"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3551"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3552"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3553"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3559"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3591"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3592"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3593"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.3599"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.36"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.37X1"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.37X2"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.37X3"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.37X9"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.39"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.40"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.41"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.42"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.43"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.44"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.49"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.51"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.52"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.59"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.610"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.618"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.620"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.621"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.622"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.628"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.630"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.638"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.641"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.649"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.65"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.69"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.8"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.9"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.A0"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.A1"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E10.A2"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.00"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.01"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.10"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.11"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.21"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.22"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.29"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.311"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.319"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3211"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3212"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3213"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3219"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3291"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3292"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3293"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3299"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3311"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3312"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3313"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3319"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3391"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3392"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3393"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3399"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3411"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3412"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3413"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3419"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3491"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3492"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3493"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3499"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3511"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3512"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3513"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3519"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3521"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3522"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3523"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3529"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3531"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3532"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3533"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3539"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3541"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3542"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3543"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3549"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3551"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3552"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3553"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3559"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3591"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3592"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3593"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.3599"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.36"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.37X1"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.37X2"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.37X3"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.37X9"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.39"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.40"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.41"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.42"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.43"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.44"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.49"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.51"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.52"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.59"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.610"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.618"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.620"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.621"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.622"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.628"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.630"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.638"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.641"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.649"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.65"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.69"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.8"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E11.9"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.00"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.01"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.10"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.11"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.21"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.22"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.29"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.311"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.319"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3211"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3212"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3213"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3219"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3291"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3292"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3293"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3299"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3311"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3312"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3313"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3319"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3391"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3392"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3393"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3399"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3411"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3412"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3413"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3419"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3491"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3492"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3493"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3499"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3511"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3512"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3513"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3519"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3521"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3522"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3523"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3529"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3531"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3532"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3533"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3539"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3541"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3542"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3543"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3549"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3551"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3552"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3553"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3559"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3591"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3592"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3593"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.3599"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.36"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.37X1"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.37X2"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.37X3"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.37X9"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.39"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.40"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.41"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.42"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.43"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.44"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.49"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.51"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.52"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.59"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.610"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.618"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.620"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.621"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.622"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.628"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.630"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.638"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.641"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.649"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.65"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.69"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.8"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "E13.9"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.011"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.012"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.013"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.019"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.02"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.03"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.111"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.112"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.113"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.119"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.12"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.13"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.311"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.312"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.313"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.319"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.32"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.33"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.811"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.812"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.813"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.819"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.82"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.83"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.911"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.912"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.913"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.919"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.92"
+    },
+    {
+      "system": "ICD-10-CM",
+      "code": "O24.93"
+    }
+  ],
+  "denialReasons": [
+    {
+      "id": "A52464-D1",
+      "text": "CGM devices that solely display results on a smartphone and do not have a stand-alone receiver or integration into an insulin infusion pump do not meet the definition of DME and will be denied as non-covered (no benefit)."
+    },
+    {
+      "id": "A52464-D2",
+      "text": "Supplies or accessories billed separately will be denied as unbundling."
+    },
+    {
+      "id": "A52464-D3",
+      "text": "Separate billing of CGM sensors and transmitters will be denied as unbundling."
+    },
+    {
+      "id": "A52464-D4",
+      "text": "If a beneficiary never uses a DME receiver or insulin infusion pump to display CGM glucose data, the supply allowance is not covered by Medicare."
+    },
+    {
+      "id": "A52464-D5",
+      "text": "Smart devices are non-covered by Medicare because they do not meet the definition of DME (i.e., not primarily medical in nature and are useful in the absence of illness)."
+    },
+    {
+      "id": "A52464-D6",
+      "text": "If a CGM system is billed using HCPCS E2102 or E2103 but the CGM system is not on the PCL for the particular HCPCS code, then the claim will be denied as incorrect coding."
+    },
+    {
+      "id": "A52464-D7",
+      "text": "Products reviewed by the PDAC which do not meet the DME benefit category requirements must be coded as A9276, A9277, A9278, or A9279 and will be denied as non-covered (no Medicare Benefit)."
+    },
+    {
+      "id": "A52464-D8",
+      "text": "Alcohol or peroxide (codes A4244, A4245), betadine or hexachlorophene (pHisohex) (codes A4246, A4247) are non-covered since these items are not required for the proper functioning of the device."
+    },
+    {
+      "id": "A52464-D9",
+      "text": "Urine test reagent strips or tablets (code A4250) are non-covered since they are not used with a glucose monitor."
+    },
+    {
+      "id": "A52464-D10",
+      "text": "Reflectance colorimeter devices used for measuring blood glucose levels in clinical settings are not covered as durable medical equipment for use in the home because their need for frequent professional re-calibration makes them unsuitable for home use."
+    },
+    {
+      "id": "A52464-D11",
+      "text": "Glucose monitors that are not designed for use in the home must be coded A9270 and will be denied as statutorily non-covered (no benefit category)."
+    },
+    {
+      "id": "A52464-D12",
+      "text": "Home blood glucose disposable monitors, including test strips (code A9275) are non-covered because these monitors do not meet the definition of DME."
+    },
+    {
+      "id": "A52464-D13",
+      "text": "Claims for the specified items subject to Final Rule 1713 (84 Fed. Reg Vol 217) that do not meet the face-to-face encounter and WOPD requirements specified in the LCD-related Standard Documentation Requirements Article (A55426) will be denied as not reasonable and necessary."
+    },
+    {
+      "id": "A52464-D14",
+      "text": "If a supplier delivers an item prior to receipt of a WOPD, it will be denied as not reasonable and necessary."
+    },
+    {
+      "id": "A52464-D15",
+      "text": "If the WOPD is not obtained prior to delivery, payment will not be made for that item even if a WOPD is subsequently obtained by the supplier."
+    },
+    {
+      "id": "A52464-D16",
+      "text": "Claim lines billed without a KF modifier will be rejected as missing information."
+    }
+  ],
+  "hcpcsCodes": [
+    {
+      "system": "HCPCS",
+      "code": "K0554"
+    },
+    {
+      "system": "HCPCS",
+      "code": "K0553"
+    },
+    {
+      "system": "HCPCS",
+      "code": "E2103"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A4239"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A9999"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A4238"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A9276"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A9277"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A9278"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A9279"
+    },
+    {
+      "system": "HCPCS",
+      "code": "E2100"
+    },
+    {
+      "system": "HCPCS",
+      "code": "E2101"
+    },
+    {
+      "system": "HCPCS",
+      "code": "E2104"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A4256"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A4271"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A9270"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A4253"
+    },
+    {
+      "system": "HCPCS",
+      "code": "E0607"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A4236"
+    },
+    {
+      "system": "HCPCS",
+      "code": "A4259"
+    }
+  ],
+  "sourceHash": "679f095b3c75f1f7ffe5c49b0f63d5ffd2057a146a1b5403302f0d6b31ebe044"
+}
