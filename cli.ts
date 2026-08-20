@@ -10,20 +10,25 @@ import { createGraph } from './src/graph/db.ts';
 import { ensureConstraints } from './src/graph/schema.ts';
 import { loadSubgraph } from './src/graph/write.ts';
 import { validateGraph } from './src/graph/validate.ts';
-import type { ArticleInput, LcdInput } from './src/types.ts';
+import { signalReview, startReview } from './src/workflow/client.ts';
+import type { ArticleInput, LcdInput, ReviewDecision } from './src/types.ts';
 
 const DEFAULT_OLLAMA_URL = 'http://localhost:11434';
 const DEFAULT_EXTRACTION_MODEL = 'qwen3.8:27b';
 const FIXTURES_DIR = 'fixtures';
 
 const USAGE = `Usage:
-  node cli.ts extract <path-to-lcd.pdf>         Extract requirements and snapshot them
-  node cli.ts load <lcdId> [articleId]          Load a snapshot into the graph and validate it
+  node cli.ts extract <path-to-lcd.pdf>                        Extract requirements and snapshot them
+  node cli.ts load <lcdId> [articleId]                         Load a snapshot into the graph and validate it
+  node cli.ts review-start <lcdId> [articleId]                 Start the review workflow for a snapshot
+  node cli.ts review-signal <workflowId> <approve|reject> <reviewer> [note]
+                                                                Deliver a human review decision to a running workflow
 
 Environment:
   OLLAMA_URL         default ${DEFAULT_OLLAMA_URL}
   EXTRACTION_MODEL   default ${DEFAULT_EXTRACTION_MODEL}
-  NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DATABASE   see .env.example`;
+  NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DATABASE   see .env.example
+  TEMPORAL_ADDRESS, TEMPORAL_NAMESPACE, TEMPORAL_TASK_QUEUE   see .env.example`;
 
 async function runExtract(args: readonly string[]): Promise<void> {
   const pdfPath = args[0];
@@ -130,6 +135,43 @@ async function runLoad(args: readonly string[]): Promise<void> {
   }
 }
 
+async function runReviewStart(args: readonly string[]): Promise<void> {
+  const [lcdId, articleId] = args;
+  if (lcdId === undefined) throw new Error(`review-start needs an LCD id.\n\n${USAGE}`);
+
+  const snapshot = await readExtractedSnapshot(lcdId);
+  const lcd: LcdInput = {
+    id: snapshot.lcdId,
+    sourceHash: snapshot.sourceHash,
+    requirements: snapshot.requirements,
+    // TODO(HCPCS extraction): a later milestone extracts the LCD's covered
+    // codes; until then every LCD loads with no COVERS edges.
+    coveredCodes: [],
+  };
+  const article = articleId === undefined ? undefined : await readArticleSnapshot(articleId);
+
+  const workflowId = await startReview(article === undefined ? { lcd } : { lcd, article });
+  process.stdout.write(`${workflowId}\n`);
+  process.stderr.write(
+    `Run a worker to process this review: node src/workflow/worker.ts\n` +
+      `Send the review decision: node cli.ts review-signal ${workflowId} <approve|reject> <reviewer> [note]\n`,
+  );
+}
+
+async function runReviewSignal(args: readonly string[]): Promise<void> {
+  const [workflowId, decisionArg, reviewer, note] = args;
+  if (workflowId === undefined || decisionArg === undefined || reviewer === undefined) {
+    throw new Error(`review-signal needs a workflow id, decision, and reviewer.\n\n${USAGE}`);
+  }
+  if (decisionArg !== 'approve' && decisionArg !== 'reject') {
+    throw new Error(`review-signal decision must be "approve" or "reject", got "${decisionArg}".\n\n${USAGE}`);
+  }
+
+  const decision: ReviewDecision = note === undefined ? { decision: decisionArg, reviewer } : { decision: decisionArg, reviewer, note };
+  await signalReview(workflowId, decision);
+  process.stdout.write(`Signaled ${workflowId}: ${decisionArg}\n`);
+}
+
 const [verb, ...rest] = process.argv.slice(2);
 
 try {
@@ -139,6 +181,12 @@ try {
       break;
     case 'load':
       await runLoad(rest);
+      break;
+    case 'review-start':
+      await runReviewStart(rest);
+      break;
+    case 'review-signal':
+      await runReviewSignal(rest);
       break;
     default:
       throw new Error(verb === undefined ? USAGE : `Unknown command "${verb}".\n\n${USAGE}`);
