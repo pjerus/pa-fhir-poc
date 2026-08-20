@@ -11,11 +11,18 @@ services:
     environment:
       NEO4J_AUTH: "${NEO4J_USER:?copy .env.example to .env first}/${NEO4J_PASSWORD:?copy .env.example to .env first}"
       NEO4J_initial_dbms_default__database: "${NEO4J_DATABASE:-pafhirpoc}"
+      # Read only by the healthcheck below. Deliberately not NEO4J_-prefixed:
+      # the entrypoint treats those as server settings.
+      HEALTHCHECK_USER: "${NEO4J_USER}"
+      HEALTHCHECK_PASSWORD: "${NEO4J_PASSWORD}"
     volumes:
       - neo4j-data:/data
       - neo4j-logs:/logs
     healthcheck:
-      test: ["CMD-SHELL", "cat < /dev/null > /dev/tcp/localhost/7687"]
+      # Proves the POC's default database answers, not merely that a port is open.
+      test:
+        - CMD-SHELL
+        - cypher-shell -u "$${HEALTHCHECK_USER}" -p "$${HEALTHCHECK_PASSWORD}" 'RETURN 1' >/dev/null
       interval: 5s
       timeout: 3s
       retries: 20

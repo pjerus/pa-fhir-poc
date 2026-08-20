@@ -84,7 +84,11 @@ node cli.ts project <lcdId>                 # M4: emits out/<lcdId>.{crd,dtr,pla
 
 ## Neo4j
 
-`docker-compose.yml` starts a Community container dedicated to this POC, because Community serves exactly one user database per instance. It exists for reviewers and CI. Locally the database is created by hand in Neo4j Desktop instead, so point `.env` at that instance before M2 — the committed `.env.example` values are compose defaults.
+`docker compose up -d` starts `pa-fhir-poc-neo4j`, a Community container dedicated to this POC. Community serves exactly one user database per instance, so the POC gets its own container rather than an extra database inside a shared one; `NEO4J_DATABASE` (default `pafhirpoc`) becomes that instance's default database via `initial.dbms.default_database`.
+
+Credentials and ports come from `.env` (copy `.env.example`); compose fails loudly if `NEO4J_USER`/`NEO4J_PASSWORD` are unset. Host ports are overridable (`NEO4J_HTTP_PORT`, `NEO4J_BOLT_PORT`) because two other stopped Neo4j containers on this machine claim 7474/7687 and 7475/7689.
+
+The healthcheck runs `cypher-shell 'RETURN 1'`, so `healthy` means the database answers queries, not just that a port is open. It reads `HEALTHCHECK_USER`/`HEALTHCHECK_PASSWORD` — deliberately not `NEO4J_`-prefixed, since the image's entrypoint treats those as server settings.
 
 The Temporal review workflow (`propose → validate → await signal → commit | compensate`) blocks indefinitely on a human `{ decision, reviewer, note }` signal — that block is the feature, not a bug. `src/workflow/client.ts` sends it; M3 tests use `@temporalio/testing`.
 
