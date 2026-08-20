@@ -99,10 +99,10 @@ node src/workflow/worker.ts
 node cli.ts run fixtures/L33822.pdf fixtures/A52464.pdf
 ```
 
-This extracts both PDFs, loads the graph, starts the review workflow, prints
-the workflow id, and then blocks. That block is the durable human gate —
-the point of the design, not a hang. Nothing projects until a human signs
-off.
+This extracts both PDFs, starts the review workflow (whose first activity
+loads the graph), prints the workflow id, and then blocks. That block is the
+durable human gate — the point of the design, not a hang. Nothing projects
+until a human signs off.
 
 **Terminal C** — approve the review:
 

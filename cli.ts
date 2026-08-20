@@ -262,7 +262,12 @@ async function runRun(args: readonly string[]): Promise<void> {
     // Covered codes flow from the paired article's HCPCS listing, same as review-start.
     coveredCodes: articleResult.hcpcsCodes,
   };
-  const article: ArticleInput = articleResult;
+  const article: ArticleInput = {
+    id: articleResult.id,
+    sourceHash: articleResult.sourceHash,
+    listedCodes: articleResult.listedCodes,
+    denialReasons: articleResult.denialReasons,
+  };
 
   const workflowId = await startReview({ lcd, article });
   process.stdout.write(`${workflowId}\n`);

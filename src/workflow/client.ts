@@ -44,7 +44,7 @@ export async function awaitReview(workflowId: string): Promise<ReviewResult> {
   const connection = await Connection.connect({ address });
   try {
     const client = new Client({ connection, namespace });
-    return await client.workflow.getHandle(workflowId).result();
+    return await client.workflow.getHandle<typeof reviewLcd>(workflowId).result();
   } finally {
     await connection.close();
   }
