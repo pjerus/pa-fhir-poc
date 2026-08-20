@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { splitSections } from './sections.ts';
+import { cutAtRevisionHistory, splitSections } from './sections.ts';
 
 test('splits a policy into its three sections by heading', () => {
   const text = [
@@ -70,4 +70,59 @@ test('warns instead of crashing when a section heading is absent', () => {
     'No "documentation" heading found; downstream extraction will skip that section.',
     'No "limitations" heading found; downstream extraction will skip that section.',
   ]);
+});
+
+test('a heading-candidate line repeated more than 3 times is a recurring table label, not a heading', () => {
+  const text = [
+    'Indications',
+    'Real indications text.',
+    'LIMITATION',
+    'LIMITATION',
+    'LIMITATION',
+    'LIMITATION',
+  ].join('\n');
+
+  const { sections, warnings } = splitSections(text);
+
+  assert.equal(sections.indications, 'Real indications text.');
+  assert.equal(sections.limitations, null);
+  assert.ok(
+    warnings.includes(
+      'No "limitations" heading found; downstream extraction will skip that section.',
+    ),
+  );
+});
+
+test('cutAtRevisionHistory returns the text up to that heading', () => {
+  const before = 'Some policy text before the cutoff.';
+  const after = 'Indications: this must not resurface after the cutoff.';
+  const text = [before, 'Revision History', after].join('\n');
+
+  assert.equal(cutAtRevisionHistory(text), before);
+});
+
+test('cutAtRevisionHistory returns the whole input when the heading is absent', () => {
+  const text = ['Line one.', 'Line two.'].join('\n');
+
+  assert.equal(cutAtRevisionHistory(text), text);
+});
+
+test('revision history is terminal: no later heading can resume section assignment', () => {
+  const text = [
+    'Indications',
+    'Real indications text.',
+    'Revision History',
+    'Documentation Requirements',
+    'This is change-log boilerplate and must not be captured.',
+  ].join('\n');
+
+  const { sections, warnings } = splitSections(text);
+
+  assert.equal(sections.indications, 'Real indications text.');
+  assert.equal(sections.documentation, null);
+  assert.ok(
+    warnings.includes(
+      'No "documentation" heading found; downstream extraction will skip that section.',
+    ),
+  );
 });

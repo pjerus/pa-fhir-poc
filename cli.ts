@@ -2,6 +2,8 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import { extractArticle } from './src/extract/article.ts';
+import type { ArticleExtractionResult } from './src/extract/article.ts';
 import { extractLcd } from './src/extract/extract.ts';
 import type { ExtractionResult } from './src/extract/extract.ts';
 import { createOllamaClient } from './src/extract/llm-client.ts';
@@ -11,7 +13,7 @@ import { ensureConstraints } from './src/graph/schema.ts';
 import { loadSubgraph } from './src/graph/write.ts';
 import { validateGraph } from './src/graph/validate.ts';
 import { signalReview, startReview } from './src/workflow/client.ts';
-import type { ArticleInput, LcdInput, ReviewDecision } from './src/types.ts';
+import type { ArticleInput, CodeRef, LcdInput, ReviewDecision } from './src/types.ts';
 
 const DEFAULT_OLLAMA_URL = 'http://localhost:11434';
 const DEFAULT_EXTRACTION_MODEL = 'qwen3.8:27b';
@@ -19,6 +21,7 @@ const FIXTURES_DIR = 'fixtures';
 
 const USAGE = `Usage:
   node cli.ts extract <path-to-lcd.pdf>                        Extract requirements and snapshot them
+  node cli.ts extract-article <path-to-article.pdf>            Extract ICD-10/HCPCS codes and denial reasons, and snapshot them
   node cli.ts load <lcdId> [articleId]                         Load a snapshot into the graph and validate it
   node cli.ts review-start <lcdId> [articleId]                 Start the review workflow for a snapshot
   node cli.ts review-signal <workflowId> <approve|reject> <reviewer> [note]
@@ -51,6 +54,29 @@ async function runExtract(args: readonly string[]): Promise<void> {
   process.stdout.write(`${JSON.stringify(result.requirements, null, 2)}\n`);
 }
 
+async function runExtractArticle(args: readonly string[]): Promise<void> {
+  const pdfPath = args[0];
+  if (pdfPath === undefined) throw new Error(`extract-article needs a PDF path.\n\n${USAGE}`);
+
+  const llm = createOllamaClient({
+    baseUrl: process.env.OLLAMA_URL ?? DEFAULT_OLLAMA_URL,
+    model: process.env.EXTRACTION_MODEL ?? DEFAULT_EXTRACTION_MODEL,
+  });
+
+  const result: ArticleExtractionResult = await extractArticle(pdfPath, llm);
+
+  for (const warning of result.warnings) process.stderr.write(`warning: ${warning}\n`);
+
+  const { warnings, ...snapshot } = result;
+
+  await mkdir(FIXTURES_DIR, { recursive: true });
+  const snapshotPath = join(FIXTURES_DIR, `${result.id}.article.json`);
+  await writeFile(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf8');
+  process.stderr.write(`snapshot: ${snapshotPath}\n`);
+
+  process.stdout.write(`${JSON.stringify(snapshot, null, 2)}\n`);
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
@@ -79,7 +105,13 @@ async function readExtractedSnapshot(lcdId: string): Promise<ExtractionResult> {
   return parsed as unknown as ExtractionResult;
 }
 
-async function readArticleSnapshot(articleId: string): Promise<ArticleInput> {
+interface ArticleSnapshot {
+  readonly article: ArticleInput;
+  /** HCPCS codes, when the snapshot has them (the article extractor's output). */
+  readonly hcpcsCodes: readonly CodeRef[];
+}
+
+async function readArticleSnapshot(articleId: string): Promise<ArticleSnapshot> {
   const path = join(FIXTURES_DIR, `${articleId}.article.json`);
   let raw: string;
   try {
@@ -105,7 +137,8 @@ async function readArticleSnapshot(articleId: string): Promise<ArticleInput> {
       `Malformed article snapshot at ${path}: expected id, sourceHash, listedCodes, and denialReasons.`,
     );
   }
-  return parsed as unknown as ArticleInput;
+  const hcpcsCodes = Array.isArray(parsed.hcpcsCodes) ? (parsed.hcpcsCodes as CodeRef[]) : [];
+  return { article: parsed as unknown as ArticleInput, hcpcsCodes };
 }
 
 async function runLoad(args: readonly string[]): Promise<void> {
@@ -113,20 +146,20 @@ async function runLoad(args: readonly string[]): Promise<void> {
   if (lcdId === undefined) throw new Error(`load needs an LCD id.\n\n${USAGE}`);
 
   const snapshot = await readExtractedSnapshot(lcdId);
+  const articleSnapshot = articleId === undefined ? undefined : await readArticleSnapshot(articleId);
   const lcd: LcdInput = {
     id: snapshot.lcdId,
     sourceHash: snapshot.sourceHash,
     requirements: snapshot.requirements,
-    // TODO(HCPCS extraction): a later milestone extracts the LCD's covered
-    // codes; until then every LCD loads with no COVERS edges.
-    coveredCodes: [],
+    // Covered codes flow from the paired article's HCPCS listing; an LCD
+    // loaded without an article has none.
+    coveredCodes: articleSnapshot?.hcpcsCodes ?? [],
   };
-  const article = articleId === undefined ? undefined : await readArticleSnapshot(articleId);
 
   const graph = createGraph(loadGraphConfig());
   try {
     await ensureConstraints(graph);
-    await loadSubgraph(graph, article === undefined ? { lcd } : { lcd, article });
+    await loadSubgraph(graph, articleSnapshot === undefined ? { lcd } : { lcd, article: articleSnapshot.article });
     const report = await validateGraph(graph);
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
     if (!report.clean) process.exitCode = 1;
@@ -140,17 +173,19 @@ async function runReviewStart(args: readonly string[]): Promise<void> {
   if (lcdId === undefined) throw new Error(`review-start needs an LCD id.\n\n${USAGE}`);
 
   const snapshot = await readExtractedSnapshot(lcdId);
+  const articleSnapshot = articleId === undefined ? undefined : await readArticleSnapshot(articleId);
   const lcd: LcdInput = {
     id: snapshot.lcdId,
     sourceHash: snapshot.sourceHash,
     requirements: snapshot.requirements,
-    // TODO(HCPCS extraction): a later milestone extracts the LCD's covered
-    // codes; until then every LCD loads with no COVERS edges.
-    coveredCodes: [],
+    // Covered codes flow from the paired article's HCPCS listing; an LCD
+    // loaded without an article has none.
+    coveredCodes: articleSnapshot?.hcpcsCodes ?? [],
   };
-  const article = articleId === undefined ? undefined : await readArticleSnapshot(articleId);
 
-  const workflowId = await startReview(article === undefined ? { lcd } : { lcd, article });
+  const workflowId = await startReview(
+    articleSnapshot === undefined ? { lcd } : { lcd, article: articleSnapshot.article },
+  );
   process.stdout.write(`${workflowId}\n`);
   process.stderr.write(
     `Run a worker to process this review: node src/workflow/worker.ts\n` +
@@ -178,6 +213,9 @@ try {
   switch (verb) {
     case 'extract':
       await runExtract(rest);
+      break;
+    case 'extract-article':
+      await runExtractArticle(rest);
       break;
     case 'load':
       await runLoad(rest);

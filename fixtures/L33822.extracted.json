@@ -1,0 +1,229 @@
+{
+  "lcdId": "L33822",
+  "sourceHash": "cfa7f22c35b1b3e464d48cbcaf7b6731ca359aadf11418fbeb6e7da07f93ad25",
+  "requirements": [
+    {
+      "id": "L33822-R1",
+      "text": "The item must be eligible for a defined Medicare benefit category",
+      "ordinal": 1,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R2",
+      "text": "The item must be reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member",
+      "ordinal": 2,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R3",
+      "text": "The item must meet all other applicable Medicare statutory and regulatory requirements",
+      "ordinal": 3,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R4",
+      "text": "The beneficiary has diabetes",
+      "ordinal": 4,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R5",
+      "text": "The beneficiary’s treating practitioner has concluded that the beneficiary (or the beneficiary’s caregiver) has sufficient training using the particular device prescribed as evidenced by providing a prescription for the appropriate supplies and frequency of blood glucose testing",
+      "ordinal": 5,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R6",
+      "text": "The treating practitioner certifies that the beneficiary has a severe visual impairment (i.e., best corrected visual acuity of 20/200 or worse in both eyes) requiring use of this special monitoring system",
+      "ordinal": 6,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R7",
+      "text": "The treating practitioner certifies that the beneficiary has an impairment of manual dexterity severe enough to require the use of this special monitoring system",
+      "ordinal": 7,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R8",
+      "text": "The glucose monitor is covered",
+      "ordinal": 8,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R9",
+      "text": "No more than one spring powered device per 6 months",
+      "ordinal": 9,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R10",
+      "text": "The beneficiary is not currently being treated with insulin administrations",
+      "ordinal": 10,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R11",
+      "text": "Up to 100 test strips and up to 100 lancets every 3 months",
+      "ordinal": 11,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R12",
+      "text": "The beneficiary is currently being treated with insulin administrations",
+      "ordinal": 12,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R13",
+      "text": "Up to 300 test strips and up to 300 lancets every 3 months",
+      "ordinal": 13,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R14",
+      "text": "Within the six (6) months prior to ordering quantities of strips and lancets that exceed the utilization guidelines, the treating practitioner has had an in-person or Medicare-approved telehealth visit with the beneficiary to evaluate their diabetes control and their need for the specific quantity of supplies that exceeds the usual utilization amounts",
+      "ordinal": 14,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R15",
+      "text": "Every six (6) months, for continued dispensing of quantities of testing supplies that exceed the usual utilization amounts, the treating practitioner must verify adherence to the high utilization testing regimen",
+      "ordinal": 15,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R16",
+      "text": "The beneficiary has diabetes mellitus",
+      "ordinal": 16,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R17",
+      "text": "The beneficiary’s treating practitioner has concluded that the beneficiary (or beneficiary’s caregiver) has sufficient training using the CGM prescribed as evidenced by providing a prescription",
+      "ordinal": 17,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R18",
+      "text": "The beneficiary is insulin-treated",
+      "ordinal": 18,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R19",
+      "text": "The beneficiary has a history of problematic hypoglycemia",
+      "ordinal": 19,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R20",
+      "text": "Within six (6) months prior to ordering the CGM, the treating practitioner has an in-person or Medicare-approved telehealth visit with the beneficiary to evaluate their diabetes control and determined that criteria (1)-(4) above are met.",
+      "ordinal": 20,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R21",
+      "text": "Every six (6) months following the initial prescription of the CGM, the treating practitioner conducts an in-person or Medicare-approved telehealth visit with the beneficiary to document adherence to their CGM regimen and diabetes treatment plan.",
+      "ordinal": 21,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R22",
+      "text": "A Standard Written Order (SWO) must be communicated to the supplier before a claim is submitted.",
+      "ordinal": 22,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R23",
+      "text": "For Durable Medical Equipment, Prosthetics, Orthotics and Supplies (DMEPOS) base items that require a Written Order Prior to Delivery (WOPD), the supplier must have received a signed SWO before the DMEPOS item is delivered to a beneficiary.",
+      "ordinal": 23,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R24",
+      "text": "For DMEPOS base items that require a WOPD, and also require separately billed associated options, accessories, and/or supplies, the supplier must have received a WOPD which lists the base item and which may list all the associated options, accessories, and/or supplies that are separately billed prior to the delivery of the items.",
+      "ordinal": 24,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R25",
+      "text": "Proof of delivery (POD) is a Supplier Standard and DMEPOS suppliers are required to maintain POD documentation in their files.",
+      "ordinal": 25,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R26",
+      "text": "For DMEPOS items and supplies provided on a recurring basis, billing must be based on prospective, not retrospective use.",
+      "ordinal": 26,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R27",
+      "text": "For DMEPOS products that are supplied as refills to the original order, suppliers must contact the beneficiary, and document an affirmative response, prior to dispensing the refill and not automatically ship on a pre-determined basis, even if authorized by the beneficiary.",
+      "ordinal": 27,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R28",
+      "text": "Contact with the beneficiary or designee regarding refills must take place no sooner than 30 calendar days prior to the expected end of the current supply.",
+      "ordinal": 28,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R29",
+      "text": "For delivery of refills, the supplier must deliver the DMEPOS product no sooner than 10 calendar days prior to the expected end of the current supply.",
+      "ordinal": 29,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R30",
+      "text": "For all DMEPOS items that are provided on a recurring basis, suppliers are required to have contact with the beneficiary or caregiver/designee and document an affirmative response, prior to dispensing a new supply of items.",
+      "ordinal": 30,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R31",
+      "text": "Suppliers must verify with the treating practitioner that any changed or atypical utilization is warranted.",
+      "ordinal": 31,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R32",
+      "text": "It is expected that the beneficiary's medical records will reflect the need for the care provided.",
+      "ordinal": 32,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R33",
+      "text": "This documentation must be available upon request.",
+      "ordinal": 33,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R34",
+      "text": "For any item to be covered by Medicare, it must be eligible for a defined Medicare benefit category",
+      "ordinal": 34,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R35",
+      "text": "For any item to be covered by Medicare, it must be reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member",
+      "ordinal": 35,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R36",
+      "text": "For any item to be covered by Medicare, it must meet all other applicable Medicare statutory and regulatory requirements",
+      "ordinal": 36,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R37",
+      "text": "In addition to the “reasonable and necessary” criteria contained in this LCD there are other payment rules, which are discussed in the following documents, that must also be met prior to Medicare reimbursement",
+      "ordinal": 37,
+      "category": "limitation"
+    }
+  ],
+  "warnings": []
+}

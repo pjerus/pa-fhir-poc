@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { extractPdfText } from './pdf-text.ts';
+import { collapseRepeatedRuns, extractPdfText } from './pdf-text.ts';
 
 test('throws an actionable error naming the PDF that is missing', async () => {
   await assert.rejects(
@@ -27,4 +27,22 @@ test('extracts text from every page of a PDF', async () => {
   assert.match(pages[0] ?? '', /documented diagnosis/);
   assert.match(pages[1] ?? '', /Documentation Requirements/);
   assert.match(text, /Indications[\s\S]*Documentation Requirements/);
+});
+
+test('collapses a line that is one substring consecutively repeated', () => {
+  const text = [
+    'Coding GuidelinesCoding GuidelinesCoding Guidelines',
+    'A normal line stays intact.',
+  ].join('\n');
+
+  assert.equal(
+    collapseRepeatedRuns(text),
+    ['Coding Guidelines', 'A normal line stays intact.'].join('\n'),
+  );
+});
+
+test('does not alter a line that only coincidentally repeats a short word', () => {
+  const text = 'The device must be used as directed as directed by the physician.';
+
+  assert.equal(collapseRepeatedRuns(text), text);
 });
