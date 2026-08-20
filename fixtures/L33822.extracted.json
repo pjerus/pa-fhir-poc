@@ -1,0 +1,193 @@
+{
+  "lcdId": "L33822",
+  "sourceHash": "712c045e5f72b1c8ba3c81d7e9b9880638dd628bb7a26c4907b5544584aeffe1",
+  "requirements": [
+    {
+      "id": "L33822-R1",
+      "text": "The beneficiary has diabetes (Refer to the ICD-10 code list in the LCD-related Policy Article for applicable diagnoses)",
+      "ordinal": 1,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R2",
+      "text": "The beneficiary’s treating practitioner has concluded that the beneficiary (or the beneficiary’s caregiver) has sufficient training using the particular device prescribed as evidenced by providing a prescription for the appropriate supplies and frequency of blood glucose testing",
+      "ordinal": 2,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R3",
+      "text": "The treating practitioner certifies that the beneficiary has a severe visual impairment (i.e., best corrected visual acuity of 20/200 or worse in both eyes) requiring use of this special monitoring system",
+      "ordinal": 3,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R4",
+      "text": "The treating practitioner certifies that the beneficiary has an impairment of manual dexterity severe enough to require the use of this special monitoring system",
+      "ordinal": 4,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R5",
+      "text": "The beneficiary has diabetes mellitus (Refer to the ICD-10 code list in the LCD-related Policy Article for applicable diagnoses)",
+      "ordinal": 5,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R6",
+      "text": "The beneficiary’s treating practitioner has concluded that the beneficiary (or beneficiary’s caregiver) has sufficient training using the CGM prescribed as evidenced by providing a prescription",
+      "ordinal": 6,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R7",
+      "text": "The beneficiary is insulin-treated",
+      "ordinal": 7,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R8",
+      "text": "The beneficiary has a history of problematic hypoglycemia",
+      "ordinal": 8,
+      "category": "indication"
+    },
+    {
+      "id": "L33822-R9",
+      "text": "Within six (6) months prior to ordering the CGM, the treating practitioner has an in-person or Medicare-approved telehealth visit with the beneficiary to evaluate their diabetes control and determined that criteria (1)-(4) above are met.",
+      "ordinal": 9,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R10",
+      "text": "Every six (6) months following the initial prescription of the CGM, the treating practitioner conducts an in-person or Medicare-approved telehealth visit with the beneficiary to document adherence to their CGM regimen and diabetes treatment plan.",
+      "ordinal": 10,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R11",
+      "text": "A Standard Written Order (SWO) must be communicated to the supplier before a claim is submitted.",
+      "ordinal": 11,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R12",
+      "text": "For Durable Medical Equipment, Prosthetics, Orthotics and Supplies (DMEPOS) base items that require a Written Order Prior to Delivery (WOPD), the supplier must have received a signed SWO before the DMEPOS item is delivered to a beneficiary.",
+      "ordinal": 12,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R13",
+      "text": "For DMEPOS base items that require a WOPD, and also require separately billed associated options, accessories, and/or supplies, the supplier must have received a WOPD which lists the base item and which may list all the associated options, accessories, and/or supplies that are separately billed prior to the delivery of the items.",
+      "ordinal": 13,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R14",
+      "text": "Proof of delivery (POD) is a Supplier Standard and DMEPOS suppliers are required to maintain POD documentation in their files.",
+      "ordinal": 14,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R15",
+      "text": "For DMEPOS items and supplies provided on a recurring basis, billing must be based on prospective, not retrospective use.",
+      "ordinal": 15,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R16",
+      "text": "For DMEPOS products that are supplied as refills to the original order, suppliers must contact the beneficiary, and document an affirmative response, prior to dispensing the refill and not automatically ship on a pre-determined basis, even if authorized by the beneficiary.",
+      "ordinal": 16,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R17",
+      "text": "Contact with the beneficiary or designee regarding refills must take place no sooner than 30 calendar days prior to the expected end of the current supply.",
+      "ordinal": 17,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R18",
+      "text": "For delivery of refills, the supplier must deliver the DMEPOS product no sooner than 10 calendar days prior to the expected end of the current supply.",
+      "ordinal": 18,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R19",
+      "text": "For all DMEPOS items that are provided on a recurring basis, suppliers are required to have contact with the beneficiary or caregiver/designee and document an affirmative response, prior to dispensing a new supply of items.",
+      "ordinal": 19,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R20",
+      "text": "Suppliers must verify with the treating practitioner that any changed or atypical utilization is warranted.",
+      "ordinal": 20,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R21",
+      "text": "The beneficiary's medical records will reflect the need for the care provided and this documentation must be available upon request.",
+      "ordinal": 21,
+      "category": "documentation"
+    },
+    {
+      "id": "L33822-R22",
+      "text": "Contact with the beneficiary or caregiver/designee for DMEPOS products supplied as refills must document an affirmative response",
+      "ordinal": 22,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R23",
+      "text": "Contact with the beneficiary or designee regarding refills must take place no sooner than 30 calendar days prior to the expected end of the current supply",
+      "ordinal": 23,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R24",
+      "text": "For delivery of refills, the supplier must deliver the DMEPOS product no sooner than 10 calendar days prior to the expected end of the current supply",
+      "ordinal": 24,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R25",
+      "text": "Billing for supply allowance code A4238 or A4239 is limited to three (3) units of service (UOS) per ninety (90) days",
+      "ordinal": 25,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R26",
+      "text": "Billing more than three (3) UOS per ninety (90) days of code A4238 or A4239 will be denied as not reasonable and necessary",
+      "ordinal": 26,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R27",
+      "text": "The beneficiary’s treating practitioner has concluded that the beneficiary (or beneficiary’s caregiver) has sufficient training using the CGM prescribed as evidenced by providing a prescription",
+      "ordinal": 27,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R28",
+      "text": "Adjunctive CGM devices do not replace a standard home BGM",
+      "ordinal": 28,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R29",
+      "text": "HCPCS code A4238 does not include a home BGM and related BGM testing supplies",
+      "ordinal": 29,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R30",
+      "text": "No more than a 90-day supply of CGM supplies may be dispensed at a time",
+      "ordinal": 30,
+      "category": "limitation"
+    },
+    {
+      "id": "L33822-R31",
+      "text": "Refill requirements do not apply to code K0553 or A4238",
+      "ordinal": 31,
+      "category": "limitation"
+    }
+  ],
+  "warnings": []
+}
