@@ -19,111 +19,138 @@ export interface ArticleExtractionResult extends ArticleSnapshot {
   readonly sourceHash: string;
 }
 
-const MAX_HEADING_WORDS = 12;
+/**
+ * Real MCD article headings wrap across lines (a PDF's page-text extraction
+ * breaks "...Codes that Support Medical" and "Necessity" onto separate
+ * lines) and are not reliably all-caps or single-line ("CPT/HCPCS Codes" vs.
+ * "Coding Information"). Per-line heading detection can never find these, so
+ * region bounds are located as flat-text regex matches over the whole
+ * (already revision-history-cut) source string instead -- `\s+` between
+ * words spans a line break the same as a literal space.
+ */
+interface FlatMatch {
+  readonly start: number;
+  readonly end: number;
+}
+
+function firstMatch(text: string, pattern: RegExp): FlatMatch | null {
+  const found = pattern.exec(text);
+  return found === null ? null : { start: found.index, end: found.index + found[0].length };
+}
 
 /**
- * Article headings follow the same structural shape as LCD section headings
- * (see sections.ts): short, non-sentence lines, sometimes trailing a colon.
- * The colon is stripped before the word-count/period checks apply. Unlike
- * sections.ts, code-list bodies here are single short lines too (a code plus
- * its description, e.g. "E0607 Home blood glucose monitor"), so word count
- * alone cannot tell a heading from a code line -- these article headings are
- * conventionally rendered in all caps, so that is required as well.
+ * Whitespace-delimited tokens in `text` whose *entire* token matches `shape`,
+ * deduplicated in first-seen order. Splitting on whitespace only (not on
+ * punctuation) matters: a punctuation-based split can shear a longer
+ * compound token (e.g. an id or a hyphenated pair) into pieces where a
+ * fragment coincidentally looks like a real code. Full-matching the
+ * whitespace-delimited token instead means a code sitting next to a comma
+ * or period (a list item, a sentence) is only recognised when the
+ * punctuation itself isn't glued onto the token by the source text.
  */
-function isHeadingLike(rawLine: string): boolean {
-  const line = rawLine.trim().replace(/:$/, '');
-  if (line === '' || line.endsWith('.')) return false;
-  if (line.split(/\s+/).length > MAX_HEADING_WORDS) return false;
-  const letters = line.replace(/[^A-Za-z]/g, '');
-  return letters !== '' && letters === letters.toUpperCase();
-}
-
-/** First index at or after `fromIndex` whose line is heading-like and matches `test`. */
-function findHeadingIndex(
-  lines: readonly string[],
-  test: (headingText: string) => boolean,
-  fromIndex = 0,
-): number {
-  for (let i = fromIndex; i < lines.length; i++) {
-    const line = (lines[i] ?? '').trim().replace(/:$/, '');
-    if (isHeadingLike(line) && test(line)) return i;
-  }
-  return -1;
-}
-
-function linesOf(text: string): string[] {
-  return text.split('\n').map((line) => line.trim());
-}
-
-/** Tokens in `lines` matching `shape`, deduplicated in first-seen order. */
-function dedupTokens(lines: readonly string[], shape: RegExp): string[] {
+function tokensMatching(text: string, shape: RegExp): string[] {
   const seen = new Set<string>();
   const tokens: string[] = [];
-  for (const line of lines) {
-    for (const token of line.split(/[^A-Za-z0-9.]+/)) {
-      if (token === '' || !shape.test(token) || seen.has(token)) continue;
-      seen.add(token);
-      tokens.push(token);
-    }
+  for (const token of text.split(/\s+/)) {
+    if (token === '' || !shape.test(token) || seen.has(token)) continue;
+    seen.add(token);
+    tokens.push(token);
   }
   return tokens;
 }
 
-const ICD10_SUPPORT_HEADING = /ICD-?10.{0,4}CM CODES? THAT SUPPORT MEDICAL NECESSITY/i;
-const ICD10_ANY_HEADING = /ICD-?10/i;
+const ICD10_SUPPORT_HEADING = /ICD-?10-?CM\s+Codes\s+that\s+Support\s+Medical\s+Necessity/i;
+const ICD10_DO_NOT_SUPPORT_HEADING = /ICD-?10-?CM\s+Codes\s+that\s+DO\s+NOT\s+Support/i;
+const ICD10_PCS_HEADING = /ICD-?10-?PCS\s+Codes/i;
 const ICD10_CODE_SHAPE = /^[A-TV-Z][0-9]{2}(?:\.[0-9A-Z]{1,4})?$/;
 const ICD10_HEADING_LABEL = 'ICD-10-CM Codes That Support Medical Necessity';
 
 /**
- * The ICD-10 support-list region runs from its heading to the next ICD-10
- * heading (typically a "DO NOT SUPPORT" group) so codes from later groups
- * are never vacuumed in as supporting codes.
+ * The ICD-10 support-list region runs from the end of its heading match to
+ * whichever comes first: the "DO NOT Support" group's heading, the
+ * ICD-10-PCS heading, or end of text -- so codes from later groups are
+ * never vacuumed in as supporting codes.
  */
 export function extractIcd10Codes(text: string): CodeRef[] {
-  const lines = linesOf(text);
-  const startIndex = findHeadingIndex(lines, (line) => ICD10_SUPPORT_HEADING.test(line));
-  if (startIndex === -1) {
+  const heading = firstMatch(text, ICD10_SUPPORT_HEADING);
+  if (heading === null) {
     throw new Error(`Could not find a "${ICD10_HEADING_LABEL}" heading in the article.`);
   }
 
-  const endIndex = findHeadingIndex(lines, (line) => ICD10_ANY_HEADING.test(line), startIndex + 1);
-  const region = lines.slice(startIndex + 1, endIndex === -1 ? lines.length : endIndex);
+  const rest = text.slice(heading.end);
+  const boundaries = [firstMatch(rest, ICD10_DO_NOT_SUPPORT_HEADING), firstMatch(rest, ICD10_PCS_HEADING)]
+    .filter((match): match is FlatMatch => match !== null)
+    .map((match) => match.start);
+  const regionEnd = boundaries.length === 0 ? rest.length : Math.min(...boundaries);
 
-  const codes = dedupTokens(region, ICD10_CODE_SHAPE);
+  const codes = tokensMatching(rest.slice(0, regionEnd), ICD10_CODE_SHAPE);
   if (codes.length === 0) {
     throw new Error(`Found the "${ICD10_HEADING_LABEL}" heading but no ICD-10-CM codes beneath it.`);
   }
   return codes.map((code) => ({ system: 'ICD-10-CM', code }));
 }
 
-const HCPCS_START_HEADING = /HCPCS CODES?/i;
-const HCPCS_ANY_HEADING = /HCPCS/i;
+const HCPCS_HEADING = /CPT\/?\s*HCPCS\s+Codes?/i;
 const HCPCS_CODE_SHAPE = /^[A-Z][0-9]{4}$/;
-const HCPCS_HEADING_LABEL = 'HCPCS Codes';
+const HCPCS_HEADING_LABEL = 'CPT/HCPCS Codes';
+// Must occupy its own line: some articles reference "the Coding Guidelines
+// section below" in prose well before the real heading, and an unanchored
+// match would find that mention first.
+const CODING_GUIDELINES_HEADING = /(?:^|\n)[ \t]*CODING\s+GUIDELINES[ \t]*(?=\n|$)/i;
+const CODING_INFORMATION_HEADING = /Coding\s+Information/i;
+const HCPCS_EMPTY_WARNING =
+  `No HCPCS codes found under the "${HCPCS_HEADING_LABEL}" heading or its "Coding Guidelines" ` +
+  'fallback; recording an empty list rather than a stub.';
+
+interface HcpcsResult {
+  readonly codes: readonly CodeRef[];
+  readonly warnings: readonly string[];
+}
 
 /**
- * The HCPCS region runs from its heading to the next heading-like line that
- * is not itself HCPCS-flavoured (e.g. an ICD-10 or non-medical-necessity
- * heading), so codes are not vacuumed from the whole document.
+ * The primary HCPCS region runs from the end of the "CPT/HCPCS Codes"
+ * heading to the start of the ICD-10 support-list heading. Some articles
+ * (e.g. ones covering a device class rather than a single code) leave that
+ * heading's own section "N/A" and instead fold the real HCPCS references
+ * into prose under "Coding Guidelines" -- so an empty primary region falls
+ * back to there. Only a missing "CPT/HCPCS Codes" heading altogether is a
+ * parse failure; a heading that is genuinely followed by zero codes in both
+ * places is a fact about the document, not a bug, so it is recorded as an
+ * empty list with a warning instead of thrown.
  */
-export function extractHcpcsCodes(text: string): CodeRef[] {
-  const lines = linesOf(text);
-  const startIndex = findHeadingIndex(lines, (line) => HCPCS_START_HEADING.test(line));
-  if (startIndex === -1) {
+export function extractHcpcsCodes(text: string): HcpcsResult {
+  const heading = firstMatch(text, HCPCS_HEADING);
+  if (heading === null) {
     throw new Error(`Could not find a "${HCPCS_HEADING_LABEL}" heading in the article.`);
   }
 
-  const endIndex = findHeadingIndex(lines, (line) => !HCPCS_ANY_HEADING.test(line), startIndex + 1);
-  const region = lines.slice(startIndex + 1, endIndex === -1 ? lines.length : endIndex);
-
-  const codes = dedupTokens(region, HCPCS_CODE_SHAPE);
-  if (codes.length === 0) {
-    throw new Error(`Found the "${HCPCS_HEADING_LABEL}" heading but no HCPCS codes beneath it.`);
+  const icd10SupportStart = firstMatch(text, ICD10_SUPPORT_HEADING)?.start ?? text.length;
+  const primaryRegion = text.slice(heading.end, Math.max(heading.end, icd10SupportStart));
+  const primaryCodes = tokensMatching(primaryRegion, HCPCS_CODE_SHAPE);
+  if (primaryCodes.length > 0) {
+    return { codes: primaryCodes.map((code) => ({ system: 'HCPCS', code })), warnings: [] };
   }
-  return codes.map((code) => ({ system: 'HCPCS', code }));
+
+  const guidelines = firstMatch(text, CODING_GUIDELINES_HEADING);
+  if (guidelines === null) {
+    return { codes: [], warnings: [HCPCS_EMPTY_WARNING] };
+  }
+  const codingInfoStart = firstMatch(text, CODING_INFORMATION_HEADING)?.start ?? icd10SupportStart;
+  const fallbackRegion = text.slice(guidelines.end, Math.max(guidelines.end, codingInfoStart));
+  const fallbackCodes = tokensMatching(fallbackRegion, HCPCS_CODE_SHAPE);
+  if (fallbackCodes.length === 0) {
+    return { codes: [], warnings: [HCPCS_EMPTY_WARNING] };
+  }
+  return { codes: fallbackCodes.map((code) => ({ system: 'HCPCS', code })), warnings: [] };
 }
 
-const NON_MEDICAL_NECESSITY_HEADING = /NON-?MEDICAL NECESSITY/i;
+const NON_MEDICAL_NECESSITY_HEADING = /NON-?MEDICAL\s+NECESSITY/i;
+// The other top-level headings this parser already recognises double as the
+// denial-reasons section's closing boundary. ("Next heading-like line" is
+// not a usable alternative here: real documents have headings that wrap
+// across lines, and code-list lines that are mostly digits and commas with
+// one stray capital letter trivially look "all caps".)
+const DENIAL_REASON_SECTION_END_HEADINGS = [CODING_GUIDELINES_HEADING, ICD10_SUPPORT_HEADING, HCPCS_HEADING];
 
 interface DenialReasonSection {
   readonly body: string;
@@ -138,20 +165,22 @@ interface DenialReasonSection {
  * parsers, prose without a clean heading is exactly what the LLM is for).
  */
 function findDenialReasonSection(text: string): DenialReasonSection {
-  const lines = linesOf(text);
-  const startIndex = findHeadingIndex(lines, (line) => NON_MEDICAL_NECESSITY_HEADING.test(line));
-  if (startIndex === -1) {
+  const heading = firstMatch(text, NON_MEDICAL_NECESSITY_HEADING);
+  if (heading === null) {
     return {
-      body: lines.join('\n'),
+      body: text,
       warnings: [
         'No "Non-Medical Necessity" heading found; using the whole article text for denial-reason extraction.',
       ],
     };
   }
 
-  const endIndex = findHeadingIndex(lines, () => true, startIndex + 1);
-  const body = lines.slice(startIndex + 1, endIndex === -1 ? lines.length : endIndex).join('\n');
-  return { body, warnings: [] };
+  const rest = text.slice(heading.end);
+  const boundaries = DENIAL_REASON_SECTION_END_HEADINGS.map((pattern) => firstMatch(rest, pattern)?.start).filter(
+    (start): start is number => start !== undefined,
+  );
+  const bodyEnd = boundaries.length === 0 ? rest.length : Math.min(...boundaries);
+  return { body: rest.slice(0, bodyEnd), warnings: [] };
 }
 
 function denialReasonSchema(): unknown {
@@ -290,10 +319,16 @@ export async function parseArticleText(
   llm: LlmClient,
 ): Promise<ArticleSnapshot> {
   const listedCodes = extractIcd10Codes(text);
-  const hcpcsCodes = extractHcpcsCodes(text);
-  const { denialReasons, warnings } = await extractDenialReasons(text, articleId, llm);
+  const { codes: hcpcsCodes, warnings: hcpcsWarnings } = extractHcpcsCodes(text);
+  const { denialReasons, warnings: denialWarnings } = await extractDenialReasons(text, articleId, llm);
 
-  return { id: articleId, listedCodes, denialReasons, hcpcsCodes, warnings };
+  return {
+    id: articleId,
+    listedCodes,
+    denialReasons,
+    hcpcsCodes,
+    warnings: [...hcpcsWarnings, ...denialWarnings],
+  };
 }
 
 export async function extractArticle(pdfPath: string, llm: LlmClient): Promise<ArticleExtractionResult> {
