@@ -17,13 +17,13 @@ export function syntheticSubgraph(overrides: Partial<ApprovedSubgraph> = {}): Ap
       { id: 'TEST-P-LCD1-R4', text: 'Limitation requirement one.', ordinal: 4, category: 'limitation' },
     ],
     coveredCodes: [
-      { system: 'HCPCS', code: 'E9819' },
-      { system: 'HCPCS', code: 'K9813' },
+      { system: 'HCPCS', code: 'TEST-P-E9819' },
+      { system: 'HCPCS', code: 'TEST-P-K9813' },
     ],
     article: {
       id: 'TEST-P-ART1',
       sourceHash: 'hash-art',
-      listedCodes: [{ system: 'ICD-10-CM', code: 'E99.1' }],
+      listedCodes: [{ system: 'ICD-10-CM', code: 'TEST-P-E99.1' }],
       denialReasons: [{ id: 'TEST-P-ART1-D1', text: 'Not medically necessary.' }],
     },
     ...overrides,

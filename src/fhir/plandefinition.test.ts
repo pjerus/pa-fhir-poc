@@ -34,10 +34,10 @@ test('buildPlanDefinition emits one action per covered code, each with a one-ele
   assert.ok(first);
   assert.ok(second);
   assert.deepEqual(first.code, [
-    { coding: [{ system: 'http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets', code: 'E9819' }] },
+    { coding: [{ system: 'http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets', code: 'TEST-P-E9819' }] },
   ]);
   assert.deepEqual(second.code, [
-    { coding: [{ system: 'http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets', code: 'K9813' }] },
+    { coding: [{ system: 'http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets', code: 'TEST-P-K9813' }] },
   ]);
 
   assert.equal(first.definitionCanonical, instanceCanonical('Questionnaire', 'TEST-P-LCD1'));

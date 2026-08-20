@@ -36,8 +36,8 @@ test('buildCrdResponse source.label contains lcdId and title', () => {
 test('buildCrdResponse detail contains every covered code pair and every requirement text, plus the documentation heading', () => {
   const [card] = buildCrdResponse(syntheticSubgraph()).cards;
   assert.ok(card);
-  assert.match(card.detail, /HCPCS E9819/);
-  assert.match(card.detail, /HCPCS K9813/);
+  assert.match(card.detail, /HCPCS TEST-P-E9819/);
+  assert.match(card.detail, /HCPCS TEST-P-K9813/);
   assert.match(card.detail, /Indication requirement one\./);
   assert.match(card.detail, /Documentation requirement one\./);
   assert.match(card.detail, /Documentation requirement two\./);
