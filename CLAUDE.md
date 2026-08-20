@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository state
 
-This repo currently contains **only** `PA-AI-POC-PLAN.md` — no source, no `package.json`, no git repo. The plan is the spec; everything below is derived from it. Read `PA-AI-POC-PLAN.md` in full before writing code — it is the authority on scope, milestone ordering, and the acceptance bar.
+Read `PA-AI-POC-PLAN.md` in full before writing code — it is the authority on scope, milestone ordering, and the acceptance bar.
 
-**Current milestone: none started — M1 is next.** Keep this line current as milestones land; it is the fastest way for a fresh session to know where the build stands.
+**Current milestone: M1 built and green; M2 is next.** Keep this line current as milestones land; it is the fastest way for a fresh session to know where the build stands.
 
-`git init` before starting M1 — the plan mandates a commit per milestone and there is no repository yet.
+**M1's acceptance gate has not run against a real LCD.** `test/acceptance.test.ts` discovers `fixtures/*.expected.json` and skips when there are none — so `npm test` is green without proving anything about a real coverage policy. The chain was proven end-to-end against the live model on a synthetic two-page PDF only. Placing `fixtures/L33822.pdf` plus a hand-authored `fixtures/L33822.expected.json` is what closes M1.
 
 ## What this project is
 
@@ -52,22 +52,39 @@ Nothing under `src/` exists yet; this is the layout the plan commits to, and whe
 
 Build strictly in order M1→M5; do not start a milestone until the previous one's tests pass, and commit per milestone with a message naming it. M6 (full Da Vinci IG conformance against real StructureDefinitions) is a labeled stretch goal, explicitly outside the done bar — M4 only does base-R4 structural validation plus correct `meta.profile` canonical URLs (kept in one `src/fhir/profiles.ts`).
 
-## Planned commands
-
-Not yet implemented — these are the interface the plan commits to.
+## Commands
 
 ```bash
-docker compose up -d              # neo4j
-temporal server start-dev         # temporal dev server
-npm test                          # node --test, colocated *.test.ts
-node --test test/extract.test.ts  # one file (Node >= 23.6 strips TS natively; on Node 22.6-22.17 add --experimental-strip-types)
-node --test --test-name-pattern 'rejects a draft'   # one test by name
+npm test                                    # node --test; TS runs unbuilt via Node type stripping
+node --test src/extract/sections.test.ts    # one file
+node --test --test-name-pattern 'combined'  # one test by name
+npx tsc --noEmit                            # typecheck (npm run typecheck)
 
-node cli.ts extract <lcd.pdf>              # M1: prints Requirement[] JSON, snapshots to fixtures/
-node cli.ts load                           # M2: upsert subgraph + run validate report
-node cli.ts run <lcd.pdf> <article.pdf>    # M5: full chain; prints workflow id, then blocks on signal
-node cli.ts project <lcdId>                # M4: emits out/<lcdId>.{crd,dtr,plandefinition}.json
+node cli.ts extract <lcd.pdf>               # M1, implemented: prints Requirement[], snapshots to fixtures/
 ```
+
+Not yet implemented — the interface the plan commits to:
+
+```bash
+docker compose up -d                        # neo4j (see "Neo4j" below)
+temporal server start-dev                   # temporal dev server
+node cli.ts load                            # M2: upsert subgraph + run validate report
+node cli.ts run <lcd.pdf> <article.pdf>     # M5: full chain; prints workflow id, then blocks on signal
+node cli.ts project <lcdId>                 # M4: emits out/<lcdId>.{crd,dtr,plandefinition}.json
+```
+
+## Decisions taken in M1
+
+- **`cli.ts` is at the repo root**, not `src/cli.ts` as the plan's layout diagram shows, so the documented `node cli.ts extract` works verbatim. It is thin glue over `src/extract/extract.ts`.
+- **`lcdId` comes from the PDF filename** (`fixtures/L33822.pdf` → `L33822`). Fixtures are keyed by LCD id, so the filename already carries it; nothing parses ids out of document text.
+- **The model does not assign `id` or `ordinal`.** It returns only `{text, category}`; `structure.ts` numbers requirements deterministically as `<lcdId>-R<n>`. Model-assigned ids would collide and drift between runs, and M2 puts a uniqueness constraint on them.
+- **A combined heading is extracted once.** "Coverage Indications, Limitations, and/or Medical Necessity" puts one body under two sections; `structure.ts` groups sections sharing a body into a single LLM call whose allowed categories are the union, so the same text never yields duplicate requirements.
+- **Ollama is called with a JSON Schema** (`format`) and `think: false`, temperature 0, via `/api/generate`. Verified against the live endpoint.
+- **Node ≥ 22.18** (`engines`), where type stripping is on by default — that is what lets `node cli.ts` run TypeScript unbuilt.
+
+## Neo4j
+
+`docker-compose.yml` starts a Community container dedicated to this POC, because Community serves exactly one user database per instance. It exists for reviewers and CI. Locally the database is created by hand in Neo4j Desktop instead, so point `.env` at that instance before M2 — the committed `.env.example` values are compose defaults.
 
 The Temporal review workflow (`propose → validate → await signal → commit | compensate`) blocks indefinitely on a human `{ decision, reviewer, note }` signal — that block is the feature, not a bug. `src/workflow/client.ts` sends it; M3 tests use `@temporalio/testing`.
 
