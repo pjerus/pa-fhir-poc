@@ -44,3 +44,10 @@ export interface ArticleInput {
   readonly listedCodes: readonly CodeRef[];
   readonly denialReasons: readonly DenialReason[];
 }
+
+/** The human decision that unblocks the review workflow's signal wait. */
+export interface ReviewDecision {
+  readonly decision: 'approve' | 'reject';
+  readonly reviewer: string;
+  readonly note?: string;
+}
