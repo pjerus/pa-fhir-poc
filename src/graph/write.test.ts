@@ -1,0 +1,225 @@
+import test, { before, after } from 'node:test';
+import assert from 'node:assert/strict';
+
+import { loadGraphConfig } from './config.ts';
+import { createGraph } from './db.ts';
+import type { Graph } from './db.ts';
+import { ensureConstraints } from './schema.ts';
+import { loadSubgraph } from './write.ts';
+import type { ArticleInput, LcdInput } from '../types.ts';
+
+let graph: Graph;
+
+async function cleanupTestData(): Promise<void> {
+  await graph.run(`
+    MATCH (n)
+    WHERE n.id STARTS WITH 'TEST-' OR n.code STARTS WITH 'TEST-'
+    DETACH DELETE n
+  `);
+}
+
+before(async () => {
+  graph = createGraph(loadGraphConfig());
+  await ensureConstraints(graph);
+  await cleanupTestData(); // in case a prior run crashed before its own cleanup
+});
+
+after(async () => {
+  await cleanupTestData();
+  await graph.close();
+});
+
+function lcdFixture(overrides: Partial<LcdInput> = {}): LcdInput {
+  return {
+    id: 'TEST-L1',
+    title: 'Test LCD',
+    version: '1',
+    sourceHash: 'TEST-hash-1',
+    requirements: [
+      { id: 'TEST-L1-R1', text: 'Requirement one', ordinal: 1, category: 'indication' },
+      { id: 'TEST-L1-R2', text: 'Requirement two', ordinal: 2, category: 'documentation' },
+    ],
+    coveredCodes: [
+      { system: 'TEST-HCPCS', code: 'TEST-E0607' },
+      { system: 'TEST-HCPCS', code: 'TEST-A4253' },
+    ],
+    ...overrides,
+  };
+}
+
+function articleFixture(overrides: Partial<ArticleInput> = {}): ArticleInput {
+  return {
+    id: 'TEST-A1',
+    title: 'Test Article',
+    version: '1',
+    sourceHash: 'TEST-hash-a1',
+    listedCodes: [
+      { system: 'TEST-HCPCS', code: 'TEST-E0607' },
+      { system: 'TEST-HCPCS', code: 'TEST-A4253' },
+    ],
+    denialReasons: [
+      { id: 'TEST-A1-D1', text: 'Denial reason one' },
+      { id: 'TEST-A1-D2', text: 'Denial reason two' },
+    ],
+    ...overrides,
+  };
+}
+
+async function requiresCount(lcdId: string): Promise<number> {
+  const rows = await graph.run(
+    `MATCH (:LCD {id: $lcdId})-[:REQUIRES]->(r) RETURN count(r) AS count`,
+    { lcdId },
+  );
+  return rows[0]?.count as number;
+}
+
+async function coversCount(lcdId: string): Promise<number> {
+  const rows = await graph.run(
+    `MATCH (:LCD {id: $lcdId})-[:COVERS]->(c) RETURN count(c) AS count`,
+    { lcdId },
+  );
+  return rows[0]?.count as number;
+}
+
+test('loadSubgraph creates the full LCD + article graph shape with correct properties', async () => {
+  await cleanupTestData();
+  await loadSubgraph(graph, { lcd: lcdFixture(), article: articleFixture() });
+
+  const [lcd] = await graph.run(`MATCH (lcd:LCD {id: $id}) RETURN properties(lcd) AS lcd`, { id: 'TEST-L1' });
+  assert.ok(lcd, 'expected the LCD node to exist');
+  const lcdProps = lcd?.lcd as Record<string, unknown>;
+  assert.equal(lcdProps.status, 'draft');
+  assert.equal(lcdProps.sourceHash, 'TEST-hash-1');
+  assert.equal(lcdProps.title, 'Test LCD');
+  assert.equal(lcdProps.version, '1');
+
+  assert.equal(await requiresCount('TEST-L1'), 2);
+  assert.equal(await coversCount('TEST-L1'), 2);
+
+  const requirementRows = await graph.run(
+    `MATCH (:LCD {id: $id})-[:REQUIRES]->(r:Requirement) RETURN properties(r) AS r ORDER BY r.ordinal`,
+    { id: 'TEST-L1' },
+  );
+  assert.deepEqual(
+    requirementRows.map((row) => row.r),
+    [
+      { id: 'TEST-L1-R1', text: 'Requirement one', ordinal: 1, category: 'indication' },
+      { id: 'TEST-L1-R2', text: 'Requirement two', ordinal: 2, category: 'documentation' },
+    ],
+  );
+
+  const [article] = await graph.run(
+    `MATCH (:LCD {id: $lcdId})-[:HAS_ARTICLE]->(article:Article {id: $articleId}) RETURN article`,
+    { lcdId: 'TEST-L1', articleId: 'TEST-A1' },
+  );
+  assert.ok(article, 'expected HAS_ARTICLE to link the LCD to its article');
+
+  const [listsCount] = await graph.run(
+    `MATCH (:Article {id: $id})-[:LISTS]->(c) RETURN count(c) AS count`,
+    { id: 'TEST-A1' },
+  );
+  assert.equal(listsCount?.count, 2);
+
+  const [definesCount] = await graph.run(
+    `MATCH (:Article {id: $id})-[:DEFINES]->(d) RETURN count(d) AS count`,
+    { id: 'TEST-A1' },
+  );
+  assert.equal(definesCount?.count, 2);
+});
+
+test('loadSubgraph is idempotent: reloading identical input creates no duplicates', async () => {
+  await cleanupTestData();
+  await loadSubgraph(graph, { lcd: lcdFixture(), article: articleFixture() });
+  await loadSubgraph(graph, { lcd: lcdFixture(), article: articleFixture() });
+
+  assert.equal(await requiresCount('TEST-L1'), 2);
+  assert.equal(await coversCount('TEST-L1'), 2);
+
+  const [requirementNodeCount] = await graph.run(
+    `MATCH (r:Requirement) WHERE r.id STARTS WITH 'TEST-L1-' RETURN count(r) AS count`,
+  );
+  assert.equal(requirementNodeCount?.count, 2, 'must not create duplicate Requirement nodes');
+
+  const [codeNodeCount] = await graph.run(
+    `MATCH (c:Code) WHERE c.code STARTS WITH 'TEST-' RETURN count(c) AS count`,
+  );
+  assert.equal(codeNodeCount?.count, 2, 'must not create duplicate Code nodes');
+});
+
+test('loadSubgraph resets an approved LCD to draft when the source hash changes', async () => {
+  await cleanupTestData();
+  await loadSubgraph(graph, { lcd: lcdFixture() });
+  await graph.run(`MATCH (lcd:LCD {id: $id}) SET lcd.status = 'approved'`, { id: 'TEST-L1' });
+
+  await loadSubgraph(graph, { lcd: lcdFixture({ sourceHash: 'TEST-hash-2' }) });
+
+  const [row] = await graph.run(`MATCH (lcd:LCD {id: $id}) RETURN lcd.status AS status, lcd.sourceHash AS sourceHash`, {
+    id: 'TEST-L1',
+  });
+  assert.equal(row?.status, 'draft');
+  assert.equal(row?.sourceHash, 'TEST-hash-2');
+});
+
+test('loadSubgraph leaves an approved LCD approved when the source hash is unchanged', async () => {
+  await cleanupTestData();
+  await loadSubgraph(graph, { lcd: lcdFixture() });
+  await graph.run(`MATCH (lcd:LCD {id: $id}) SET lcd.status = 'approved'`, { id: 'TEST-L1' });
+
+  await loadSubgraph(graph, { lcd: lcdFixture() }); // same sourceHash
+
+  const [row] = await graph.run(`MATCH (lcd:LCD {id: $id}) RETURN lcd.status AS status`, { id: 'TEST-L1' });
+  assert.equal(row?.status, 'approved');
+});
+
+test('loadSubgraph removes the REQUIRES edge for a requirement dropped from re-extraction', async () => {
+  await cleanupTestData();
+  await loadSubgraph(graph, { lcd: lcdFixture() });
+
+  const trimmed = lcdFixture({
+    requirements: [{ id: 'TEST-L1-R1', text: 'Requirement one', ordinal: 1, category: 'indication' }],
+  });
+  await loadSubgraph(graph, { lcd: trimmed });
+
+  assert.equal(await requiresCount('TEST-L1'), 1);
+  const [remaining] = await graph.run(
+    `MATCH (:LCD {id: $id})-[:REQUIRES]->(r:Requirement) RETURN r.id AS id`,
+    { id: 'TEST-L1' },
+  );
+  assert.equal(remaining?.id, 'TEST-L1-R1');
+
+  // The dropped requirement's node itself is not deleted, only the edge.
+  const [orphan] = await graph.run(`MATCH (r:Requirement {id: 'TEST-L1-R2'}) RETURN r`);
+  assert.ok(orphan, 'the orphaned Requirement node should still exist');
+});
+
+test('loadSubgraph removes stale COVERS/LISTS/DEFINES edges when codes and denial reasons are dropped', async () => {
+  await cleanupTestData();
+  await loadSubgraph(graph, { lcd: lcdFixture(), article: articleFixture() });
+
+  const trimmedLcd = lcdFixture({ coveredCodes: [{ system: 'TEST-HCPCS', code: 'TEST-E0607' }] });
+  const trimmedArticle = articleFixture({
+    listedCodes: [{ system: 'TEST-HCPCS', code: 'TEST-E0607' }],
+    denialReasons: [{ id: 'TEST-A1-D1', text: 'Denial reason one' }],
+  });
+  await loadSubgraph(graph, { lcd: trimmedLcd, article: trimmedArticle });
+
+  assert.equal(await coversCount('TEST-L1'), 1);
+
+  const [listsCount] = await graph.run(
+    `MATCH (:Article {id: $id})-[:LISTS]->(c) RETURN count(c) AS count`,
+    { id: 'TEST-A1' },
+  );
+  assert.equal(listsCount?.count, 1);
+
+  const [definesCount] = await graph.run(
+    `MATCH (:Article {id: $id})-[:DEFINES]->(d) RETURN count(d) AS count`,
+    { id: 'TEST-A1' },
+  );
+  assert.equal(definesCount?.count, 1);
+
+  // Dropped Code/DenialReason nodes are not deleted, only the edges to them.
+  const [orphanCode] = await graph.run(`MATCH (c:Code {system: 'TEST-HCPCS', code: 'TEST-A4253'}) RETURN c`);
+  assert.ok(orphanCode, 'the orphaned Code node should still exist');
+  const [orphanReason] = await graph.run(`MATCH (d:DenialReason {id: 'TEST-A1-D2'}) RETURN d`);
+  assert.ok(orphanReason, 'the orphaned DenialReason node should still exist');
+});

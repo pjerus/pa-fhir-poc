@@ -13,3 +13,34 @@ export interface Requirement {
   readonly ordinal: number;
   readonly category: RequirementCategory;
 }
+
+/** Graph-owned review lifecycle: never set by the extraction/input side. */
+export type LcdStatus = 'draft' | 'approved';
+
+export interface CodeRef {
+  readonly system: string;
+  readonly code: string;
+}
+
+export interface DenialReason {
+  readonly id: string;
+  readonly text: string;
+}
+
+export interface LcdInput {
+  readonly id: string;
+  readonly title?: string;
+  readonly version?: string;
+  readonly sourceHash: string;
+  readonly requirements: readonly Requirement[];
+  readonly coveredCodes: readonly CodeRef[];
+}
+
+export interface ArticleInput {
+  readonly id: string;
+  readonly title?: string;
+  readonly version?: string;
+  readonly sourceHash: string;
+  readonly listedCodes: readonly CodeRef[];
+  readonly denialReasons: readonly DenialReason[];
+}
