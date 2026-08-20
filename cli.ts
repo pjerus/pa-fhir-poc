@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { extractArticle } from './src/extract/article.ts';
@@ -14,7 +14,7 @@ import { ensureConstraints } from './src/graph/schema.ts';
 import { loadSubgraph } from './src/graph/write.ts';
 import { validateGraph } from './src/graph/validate.ts';
 import { projectLcd } from './src/fhir/project.ts';
-import { signalReview, startReview } from './src/workflow/client.ts';
+import { awaitReview, signalReview, startReview } from './src/workflow/client.ts';
 import type { ArticleInput, CodeRef, LcdInput, ReviewDecision } from './src/types.ts';
 
 const DEFAULT_OLLAMA_URL = 'http://localhost:11434';
@@ -30,6 +30,7 @@ const USAGE = `Usage:
   node cli.ts review-signal <workflowId> <approve|reject> <reviewer> [note]
                                                                 Deliver a human review decision to a running workflow
   node cli.ts project <lcdId>                                  Project an approved LCD to CRD/DTR/PlanDefinition FHIR artifacts
+  node cli.ts run <lcd.pdf> <article.pdf>                      Extract both, start review, block for a human signal, then project on approval
 
 Environment:
   OLLAMA_URL         default ${DEFAULT_OLLAMA_URL}
@@ -37,16 +38,15 @@ Environment:
   NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DATABASE   see .env.example
   TEMPORAL_ADDRESS, TEMPORAL_NAMESPACE, TEMPORAL_TASK_QUEUE   see .env.example`;
 
-async function runExtract(args: readonly string[]): Promise<void> {
-  const pdfPath = args[0];
-  if (pdfPath === undefined) throw new Error(`extract needs a PDF path.\n\n${USAGE}`);
-
-  const llm = createOllamaClient({
+function ollamaClient(): ReturnType<typeof createOllamaClient> {
+  return createOllamaClient({
     baseUrl: process.env.OLLAMA_URL ?? DEFAULT_OLLAMA_URL,
     model: process.env.EXTRACTION_MODEL ?? DEFAULT_EXTRACTION_MODEL,
   });
+}
 
-  const result = await extractLcd(pdfPath, llm);
+async function extractAndSnapshot(pdfPath: string): Promise<ExtractionResult> {
+  const result = await extractLcd(pdfPath, ollamaClient());
 
   for (const warning of result.warnings) process.stderr.write(`warning: ${warning}\n`);
 
@@ -55,19 +55,19 @@ async function runExtract(args: readonly string[]): Promise<void> {
   await writeFile(snapshotPath, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
   process.stderr.write(`snapshot: ${snapshotPath}\n`);
 
+  return result;
+}
+
+async function runExtract(args: readonly string[]): Promise<void> {
+  const pdfPath = args[0];
+  if (pdfPath === undefined) throw new Error(`extract needs a PDF path.\n\n${USAGE}`);
+
+  const result = await extractAndSnapshot(pdfPath);
   process.stdout.write(`${JSON.stringify(result.requirements, null, 2)}\n`);
 }
 
-async function runExtractArticle(args: readonly string[]): Promise<void> {
-  const pdfPath = args[0];
-  if (pdfPath === undefined) throw new Error(`extract-article needs a PDF path.\n\n${USAGE}`);
-
-  const llm = createOllamaClient({
-    baseUrl: process.env.OLLAMA_URL ?? DEFAULT_OLLAMA_URL,
-    model: process.env.EXTRACTION_MODEL ?? DEFAULT_EXTRACTION_MODEL,
-  });
-
-  const result: ArticleExtractionResult = await extractArticle(pdfPath, llm);
+async function extractArticleAndSnapshot(pdfPath: string): Promise<ArticleExtractionResult> {
+  const result = await extractArticle(pdfPath, ollamaClient());
 
   for (const warning of result.warnings) process.stderr.write(`warning: ${warning}\n`);
 
@@ -78,6 +78,15 @@ async function runExtractArticle(args: readonly string[]): Promise<void> {
   await writeFile(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf8');
   process.stderr.write(`snapshot: ${snapshotPath}\n`);
 
+  return result;
+}
+
+async function runExtractArticle(args: readonly string[]): Promise<void> {
+  const pdfPath = args[0];
+  if (pdfPath === undefined) throw new Error(`extract-article needs a PDF path.\n\n${USAGE}`);
+
+  const result = await extractArticleAndSnapshot(pdfPath);
+  const { warnings, ...snapshot } = result;
   process.stdout.write(`${JSON.stringify(snapshot, null, 2)}\n`);
 }
 
@@ -197,10 +206,7 @@ async function runReviewStart(args: readonly string[]): Promise<void> {
   );
 }
 
-async function runProject(args: readonly string[]): Promise<void> {
-  const [lcdId] = args;
-  if (lcdId === undefined) throw new Error(`project needs an LCD id.\n\n${USAGE}`);
-
+async function projectAndWrite(lcdId: string): Promise<void> {
   const graph = createGraph(loadGraphConfig());
   try {
     const subgraph = await readApprovedSubgraph(graph, lcdId);
@@ -220,6 +226,56 @@ async function runProject(args: readonly string[]): Promise<void> {
   } finally {
     await graph.close();
   }
+}
+
+async function runProject(args: readonly string[]): Promise<void> {
+  const [lcdId] = args;
+  if (lcdId === undefined) throw new Error(`project needs an LCD id.\n\n${USAGE}`);
+
+  await projectAndWrite(lcdId);
+}
+
+async function assertFileExists(path: string, label: string): Promise<void> {
+  try {
+    await access(path);
+  } catch {
+    throw new Error(`${label} not found: ${path}`);
+  }
+}
+
+async function runRun(args: readonly string[]): Promise<void> {
+  const [lcdPath, articlePath] = args;
+  if (lcdPath === undefined || articlePath === undefined) {
+    throw new Error(`run needs a path to the LCD PDF and a path to the article PDF.\n\n${USAGE}`);
+  }
+
+  await assertFileExists(lcdPath, 'LCD PDF');
+  await assertFileExists(articlePath, 'Article PDF');
+
+  const lcdResult = await extractAndSnapshot(lcdPath);
+  const articleResult = await extractArticleAndSnapshot(articlePath);
+
+  const lcd: LcdInput = {
+    id: lcdResult.lcdId,
+    sourceHash: lcdResult.sourceHash,
+    requirements: lcdResult.requirements,
+    // Covered codes flow from the paired article's HCPCS listing, same as review-start.
+    coveredCodes: articleResult.hcpcsCodes,
+  };
+  const article: ArticleInput = articleResult;
+
+  const workflowId = await startReview({ lcd, article });
+  process.stdout.write(`${workflowId}\n`);
+  process.stderr.write(
+    `Run a worker to process this review: node src/workflow/worker.ts\n` +
+      `Send the review decision: node cli.ts review-signal ${workflowId} <approve|reject> <reviewer> [note]\n`,
+  );
+
+  const result = await awaitReview(workflowId);
+  if (result.outcome !== 'approved') {
+    throw new Error(`Review rejected — ${result.lcdId} was not projected.`);
+  }
+  await projectAndWrite(result.lcdId);
 }
 
 async function runReviewSignal(args: readonly string[]): Promise<void> {
@@ -257,6 +313,9 @@ try {
       break;
     case 'project':
       await runProject(rest);
+      break;
+    case 'run':
+      await runRun(rest);
       break;
     default:
       throw new Error(verb === undefined ? USAGE : `Unknown command "${verb}".\n\n${USAGE}`);
