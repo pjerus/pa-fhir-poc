@@ -34,9 +34,23 @@ These are the non-obvious rules; violating them defeats the point of the POC.
 
 ## Graph model
 
-Nodes `LCD`, `Code`, `Requirement`, `ICD10`, `DenialReason`; relationships `COVERS`, `REQUIRES`, `DIAGNOSIS_OF`, `FAILS_AS`. `LCD.sourceHash` is a sha256 of the extracted source text so re-runs detect a changed PDF. Uniqueness constraints on `LCD.id`, `Code.code`, `Requirement.id`. Full property lists are in the plan's "Domain model" section.
+**This supersedes the plan's "Domain model" section.** The plan's version is the starting point; the three changes below were agreed deliberately and must not be silently reverted to match the plan.
 
-The ICD-10 codes and denial reasons come from a *paired policy article* PDF (A52464 for L33822), not the LCD itself.
+```
+(LCD {id, title, version, status, sourceHash})-[:REQUIRES]->(Requirement {id, text, ordinal, category})
+(LCD)-[:COVERS]->(Code {system, code})
+(LCD)-[:HAS_ARTICLE]->(Article {id, title, version, sourceHash})
+(Article)-[:LISTS]->(Code)
+(Article)-[:DEFINES]->(DenialReason {id, text})
+```
+
+Constraints: uniqueness on `LCD.id`, `Article.id`, `Requirement.id`; composite node key on `(Code.system, Code.code)`.
+
+1. **`Article` is a node.** ICD-10 codes and denial reasons come from a paired policy article PDF (A52464 for L33822), not the LCD. Giving the article a node puts each fact on the thing that asserts it. `Article.sourceHash` detects a changed article PDF independently of the LCD's.
+
+2. **One `Code` label, not `Code` + `ICD10`.** HCPCS and ICD-10 are the same kind of thing, and FHIR models every coded value as `{system, code}`, so a unified node projects straight through in M4. This is why the uniqueness constraint is composite — a bare constraint on `Code.code` (as the plan specifies) lets an ICD-10 code string collide with an HCPCS one.
+
+3. **`(Requirement)-[:DIAGNOSIS_OF]->` and `[:FAILS_AS]->` are deliberately not implemented.** The plan hangs these off individual requirements, but the article lists codes and denial reasons for the policy as a whole — attaching them per-requirement would mean inventing a fact neither document states. Nothing in M4 consumes them: the CRD card needs HCPCS codes plus requirements, the DTR Questionnaire needs documentation-category requirements, the PlanDefinition needs covered codes. Add these edges only if a policy article turns out to group its code lists under criteria headings, which would make the grouping a stated fact rather than an inference. Leave a TODO in `schema.ts`.
 
 ## Module map
 
@@ -101,3 +115,5 @@ The Temporal review workflow (`propose → validate → await signal → commit 
 - Requirement 5 (6-month visit) as its own node vs. a temporal property on Requirement 2 — currently a separate node.
 - `DenialReason` in-graph vs. an external validation set — in-graph for the POC.
 - CQL is stubbed as a `library` reference; real CQL generation is out of scope.
+- **Cross-system code translation is unbuilt.** A FHIR `CodeableConcept` carries an array of `Coding`s expressing *one* concept in several code systems (ICD-10-CM and SNOMED CT for the same diagnosis, say). The graph currently has no notion of a concept distinct from a code, so it cannot say two codes are equivalent, and every projected concept will carry exactly one coding. Doing this properly means a concept layer plus a real translation source (a FHIR `ConceptMap` / terminology server `$translate`), which is out of scope alongside CQL. **Consequence for M4: emit `CodeableConcept` with a one-element `coding` array, never a bare `Coding`** — then adding translations later is purely additive and no consumer changes.
+- Whether `Code.system` stores a short name (`HCPCS`) or the canonical FHIR system URI. Short names read better in the Neo4j browser; canonical URIs project without a lookup. Either way the URIs belong in one module next to `src/fhir/profiles.ts`, and they need verifying against the spec rather than recalled — HCPCS in particular has more than one plausible canonical.
