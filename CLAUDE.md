@@ -6,11 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Read `PA-AI-POC-PLAN.md` in full before writing code — it is the authority on scope, milestone ordering, and the acceptance bar.
 
-**Current milestone: M1-M3 complete and verified on the real documents; M4 (FHIR projection) is next.** The graph holds approved L33822: 37 requirements, 20 covered HCPCS codes, 461 article-listed ICD-10 codes, 16 denial reasons — all via `node cli.ts load L33822 A52464` + the review workflow. M1's acceptance gate now runs the live model (~40s) inside `npm test`.
+**Current milestone: M1-M4 complete and verified on the real documents; M5 (end-to-end glue + README) is next.** The graph holds approved L33822: 37 requirements, 20 covered HCPCS codes, 461 article-listed ICD-10 codes, 16 denial reasons — all via `node cli.ts load L33822 A52464` + the review workflow. M1's acceptance gate now runs the live model (~40s) inside `npm test`.
 
 M3 facts: the review workflow runs against the machine's shared Temporal at :7233, namespace `pa-fhir-poc` (env-driven; fresh clones use `temporal server start-dev` + `default`). Worker: `node src/workflow/worker.ts`. Review provenance lands on the LCD node as `lastReviewDecision`/`lastReviewer`/`lastReviewNote`.
 
-**M1's acceptance gate has not run against a real LCD.** `test/acceptance.test.ts` discovers `fixtures/*.expected.json` and skips when there are none — so `npm test` is green without proving anything about a real coverage policy. The chain was proven end-to-end against the live model on a synthetic two-page PDF only. Placing `fixtures/L33822.pdf` plus a hand-authored `fixtures/L33822.expected.json` is what closes M1.
+M4 facts: `node cli.ts project L33822` emits the three artifacts from the approved subgraph (verified: 14 Questionnaire items = the graph's documentation requirements, 20 PlanDefinition actions = covered HCPCS codes). Every canonical URL lives in `src/fhir/profiles.ts`, verified against the published specs — DTR Standard Questionnaire profile (DTR IG v2.2.0) tags the Questionnaire; the CDS Hooks card carries no `meta.profile` (CRD v2.2.1 models the response as a logical model, not a FHIR resource) and neither does the PlanDefinition (no CRD/DTR profile exists for it). These absences are verified findings; do not invent canonicals for them.
 
 ## What this project is
 
@@ -82,6 +82,7 @@ node src/workflow/worker.ts                 # M3, implemented: review worker (bl
 node cli.ts review-start <lcdId> [articleId]        # M3, implemented: starts review workflow, prints workflow id
 node cli.ts review-signal <wfId> <approve|reject> <reviewer> [note]   # M3, implemented
 node cli.ts extract-article <article.pdf>   # M2, implemented: ICD-10/HCPCS deterministic + denial reasons via LLM -> fixtures/<id>.article.json
+node cli.ts project <lcdId>                 # M4, implemented: emits out/<lcdId>.{crd,dtr,plandefinition}.json (approved LCDs only)
 ```
 
 Not yet implemented — the interface the plan commits to:
@@ -90,7 +91,6 @@ Not yet implemented — the interface the plan commits to:
 docker compose up -d                        # neo4j (see "Neo4j" below)
 temporal server start-dev                   # temporal dev server
 node cli.ts run <lcd.pdf> <article.pdf>     # M5: full chain; prints workflow id, then blocks on signal
-node cli.ts project <lcdId>                 # M4: emits out/<lcdId>.{crd,dtr,plandefinition}.json
 ```
 
 ## Decisions taken in M1
@@ -122,4 +122,4 @@ The Temporal review workflow (`propose → validate → await signal → commit 
 - `DenialReason` in-graph vs. an external validation set — in-graph for the POC.
 - CQL is stubbed as a `library` reference; real CQL generation is out of scope.
 - **Cross-system code translation is unbuilt.** A FHIR `CodeableConcept` carries an array of `Coding`s expressing *one* concept in several code systems (ICD-10-CM and SNOMED CT for the same diagnosis, say). The graph currently has no notion of a concept distinct from a code, so it cannot say two codes are equivalent, and every projected concept will carry exactly one coding. Doing this properly means a concept layer plus a real translation source (a FHIR `ConceptMap` / terminology server `$translate`), which is out of scope alongside CQL. **Consequence for M4: emit `CodeableConcept` with a one-element `coding` array, never a bare `Coding`** — then adding translations later is purely additive and no consumer changes.
-- Whether `Code.system` stores a short name (`HCPCS`) or the canonical FHIR system URI. Short names read better in the Neo4j browser; canonical URIs project without a lookup. Either way the URIs belong in one module next to `src/fhir/profiles.ts`, and they need verifying against the spec rather than recalled — HCPCS in particular has more than one plausible canonical.
+- ~~Whether `Code.system` stores a short name (`HCPCS`) or the canonical FHIR system URI.~~ **Resolved in M4:** short names in the graph, URIs resolved once at projection time by `codeSystemUri()` in `src/fhir/profiles.ts`. Both URIs verified against THO v7.3.0 (HCPCS Level II is `http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets` — plain `http`, with `www`).
