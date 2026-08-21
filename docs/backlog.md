@@ -4,7 +4,8 @@ Deliberately unbuilt work with a designed seam, in rough priority order.
 
 ## In-process conformance guardrail via fhir-zod-gen
 
-fhir-zod-gen (a sibling project of this repo's author) generates Zod schemas
+[fhir-zod-gen](https://github.com/pjerus/fhir-zod-gen) (a sibling project of
+this repo's author) generates Zod schemas
 (runtime validator + inferred TS type in one declaration) from FHIR IGs. This
 repo is its natural first real consumer:
 
