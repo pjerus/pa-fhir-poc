@@ -1,0 +1,97 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "L33822",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/dtr-std-questionnaire"
+    ]
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Documentation attestation questionnaire generated from Medicare LCD L33822: 14 documentation requirements.</p></div>"
+  },
+  "url": "http://example.org/pa-fhir-poc/Questionnaire/L33822",
+  "name": "L33822",
+  "status": "active",
+  "subjectType": [
+    "Patient"
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/cqf-library",
+      "valueCanonical": "http://example.org/pa-fhir-poc/Library/L33822-cql-stub"
+    }
+  ],
+  "item": [
+    {
+      "linkId": "L33822-R20",
+      "text": "Within six (6) months prior to ordering the CGM, the treating practitioner has an in-person or Medicare-approved telehealth visit with the beneficiary to evaluate their diabetes control and determined that criteria (1)-(4) above are met.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R21",
+      "text": "Every six (6) months following the initial prescription of the CGM, the treating practitioner conducts an in-person or Medicare-approved telehealth visit with the beneficiary to document adherence to their CGM regimen and diabetes treatment plan.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R22",
+      "text": "A Standard Written Order (SWO) must be communicated to the supplier before a claim is submitted.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R23",
+      "text": "For Durable Medical Equipment, Prosthetics, Orthotics and Supplies (DMEPOS) base items that require a Written Order Prior to Delivery (WOPD), the supplier must have received a signed SWO before the DMEPOS item is delivered to a beneficiary.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R24",
+      "text": "For DMEPOS base items that require a WOPD, and also require separately billed associated options, accessories, and/or supplies, the supplier must have received a WOPD which lists the base item and which may list all the associated options, accessories, and/or supplies that are separately billed prior to the delivery of the items.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R25",
+      "text": "Proof of delivery (POD) is a Supplier Standard and DMEPOS suppliers are required to maintain POD documentation in their files.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R26",
+      "text": "For DMEPOS items and supplies provided on a recurring basis, billing must be based on prospective, not retrospective use.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R27",
+      "text": "For DMEPOS products that are supplied as refills to the original order, suppliers must contact the beneficiary, and document an affirmative response, prior to dispensing the refill and not automatically ship on a pre-determined basis, even if authorized by the beneficiary.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R28",
+      "text": "Contact with the beneficiary or designee regarding refills must take place no sooner than 30 calendar days prior to the expected end of the current supply.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R29",
+      "text": "For delivery of refills, the supplier must deliver the DMEPOS product no sooner than 10 calendar days prior to the expected end of the current supply.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R30",
+      "text": "For all DMEPOS items that are provided on a recurring basis, suppliers are required to have contact with the beneficiary or caregiver/designee and document an affirmative response, prior to dispensing a new supply of items.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R31",
+      "text": "Suppliers must verify with the treating practitioner that any changed or atypical utilization is warranted.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R32",
+      "text": "It is expected that the beneficiary's medical records will reflect the need for the care provided.",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33822-R33",
+      "text": "This documentation must be available upon request.",
+      "type": "boolean"
+    }
+  ]
+}

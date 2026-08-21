@@ -1,57 +1,99 @@
 # pa-fhir-poc
 
 A proof of concept that turns a Medicare Local Coverage Determination (LCD)
-PDF into Da Vinci CRD/DTR/PlanDefinition FHIR artifacts, with a human-gated
-review step in between. L33822 (Glucose Monitors) is the demonstration
-fixture used throughout this README — the pipeline itself is generic across
-any LCD/article pair; see "Add a second LCD" below.
+PDF into Da Vinci CRD/DTR FHIR artifacts, with a durable human-gated review
+between extraction and publication. Built as a public reference for Da Vinci
+Project members: it demonstrates the shape of a prior-authorization pipeline
+end to end — not a production service.
 
-## 1. What this is
+L33822 (Glucose Monitors) and its policy article A52464 are the demonstration
+fixtures throughout; the pipeline itself is generic across any LCD/article
+pair ([add a second LCD](#8-add-a-second-lcd) is a fixtures-only change).
 
-The pipeline has four stages: an LLM reads an LCD PDF into structured
-requirements, those requirements load into a Neo4j graph alongside the
-policy's paired article (ICD-10 codes, HCPCS codes, denial reasons), a
-Temporal workflow blocks for a human reviewer to approve or reject the
-loaded snapshot, and an approved LCD projects into three FHIR artifacts
-(a CRD CDS Hooks card, a DTR Questionnaire, a PlanDefinition).
-
+```mermaid
+flowchart LR
+    PDF["LCD + article PDFs"] --> EX["LLM extraction<br/>(Ollama, local only)"]
+    EX --> SNAP["fixtures/ snapshots<br/>(deterministic boundary)"]
+    SNAP --> G[("Neo4j graph")]
+    G --> REV{"Temporal review<br/>human approve / reject"}
+    REV -->|approved| PROJ["FHIR projection"]
+    REV -->|rejected| COMP["compensate"]
+    PROJ --> CRD["CRD CDS Hooks card"]
+    PROJ --> DTR["DTR Questionnaire"]
+    PROJ --> PD["PlanDefinition"]
+    DTR -.-> VAL["HL7 validator<br/>dtr-std-questionnaire"]
+    PD -.-> VAL
 ```
-PDF ──▶ LLM extraction ──▶ Neo4j graph ──▶ Temporal human-gated review ──▶ FHIR projection
-       (Requirement[])                     (approve | reject)             (CRD / DTR / PlanDefinition)
-```
 
-This is intended as a public reference for Da Vinci Project members —
-it demonstrates the shape of a PA (prior authorization) pipeline end to end,
-not a production service.
+The LLM extraction is the only non-deterministic stage, and it is quarantined
+behind a snapshot: everything downstream is a pure function of its inputs.
+The Temporal workflow blocks indefinitely on a human signal — that block is
+the governance feature, not a hang. Nothing reaches FHIR without a named
+reviewer's approval, recorded on the graph.
+
+## 1. See the output without running anything
+
+The three artifacts projected from the reviewed L33822 graph are committed as
+[`docs/examples/`](docs/examples/):
+
+- [`L33822.dtr.json`](docs/examples/L33822.dtr.json) — DTR Questionnaire, one
+  boolean attestation item per documentation requirement.
+- [`L33822.crd.json`](docs/examples/L33822.crd.json) — CRD CDS Hooks card:
+  covered HCPCS codes plus the requirement text a clinician would see.
+- [`L33822.plandefinition.json`](docs/examples/L33822.plandefinition.json) —
+  PlanDefinition linking each covered code to the questionnaire.
 
 ## 2. What's proven vs. deliberately deferred
 
-**Proven**, on a real LCD/article pair (L33822 + A52464):
+**Proven**, on the real L33822 + A52464 documents:
 
 - The full PDF → graph → governed-review → FHIR chain, including the
-  Temporal workflow's indefinite block on a human signal.
-- Structural R4 validity of the emitted CRD card, DTR Questionnaire, and
-  PlanDefinition.
-- Correct Da Vinci `meta.profile` tagging: the DTR Questionnaire carries the
-  DTR IG v2.2.0 Standard Questionnaire profile. The other two artifacts
-  verifiably carry no `meta.profile` — this is not an oversight. The CRD
-  CDS Hooks card is not a FHIR resource under CRD v2.2.1 (the spec models
-  the response as a logical model), and no Da Vinci CRD/DTR profile exists
-  for PlanDefinition.
+  workflow's indefinite block on the human signal.
+- **IG conformance by the official HL7 validator** (M6): the DTR
+  Questionnaire validates against the DTR IG v2.2.0 `dtr-std-questionnaire`
+  StructureDefinition with **0 errors, 0 warnings**; the PlanDefinition
+  against base R4 with 0 errors. Full report, flags, and rationale:
+  [`docs/conformance/L33822.md`](docs/conformance/L33822.md).
+- Correct absence of profiles where none exist: the CRD CDS Hooks card is a
+  logical model under CRD v2.2.1 (not a FHIR resource), and no Da Vinci
+  CRD/DTR profile exists for PlanDefinition. Both are verified findings, not
+  oversights.
 
-**Deliberately deferred**, out of scope for this POC:
+**Deliberately deferred** (see [`docs/backlog.md`](docs/backlog.md)):
 
-- Full Da Vinci IG conformance against real `StructureDefinition`s — a
-  labeled stretch goal (M6).
-- Executable CQL — the PlanDefinition's `library` reference points at a
-  stub canonical, not real CQL logic.
-- A live CDS Hooks service — nothing here serves the `/cds-services`
-  endpoint a real EHR would call.
+- Executable CQL — the questionnaire's `library` reference is a stub
+  canonical.
+- A live CDS Hooks service — nothing serves the `/cds-services` endpoint an
+  EHR would call.
+- Terminology validation — the validator runs `-tx n/a`; HCPCS and ICD-10-CM
+  aren't freely distributable as FHIR CodeSystem content.
+- An in-process Zod conformance guardrail (fhir-zod-gen) — seam designed,
+  blocked on upstream tooling.
 
-## 3. Prerequisites
+## 3. Graph model
+
+```mermaid
+flowchart LR
+    LCD["LCD<br/>{id, title, version, status, sourceHash}"] -->|REQUIRES| REQ["Requirement<br/>{id, text, ordinal, category}"]
+    LCD -->|COVERS| CODE["Code<br/>{system, code}"]
+    LCD -->|HAS_ARTICLE| ART["Article<br/>{id, title, version, sourceHash}"]
+    ART -->|LISTS| CODE
+    ART -->|DEFINES| DR["DenialReason<br/>{id, text}"]
+```
+
+`Article` is its own node because ICD-10 codes and denial reasons are
+asserted by the policy article, not the LCD — each fact lives on the document
+that states it. `Code` is a single label with a composite key on
+`(system, code)`: HCPCS and ICD-10 are the same kind of thing, and FHIR
+models every coded value as `{system, code}`, so a unified node projects
+straight through. Review provenance (`lastReviewDecision`, `lastReviewer`,
+`lastReviewNote`) lands on the LCD node; only an `approved` LCD may project —
+projecting a draft throws.
+
+## 4. Prerequisites
 
 - Node >= 22.18 (type stripping runs TypeScript unbuilt, no build step)
-- Docker, for the Neo4j container
+- Docker, for the Neo4j container (and the optional conformance validator)
 - Temporal CLI, for `temporal server start-dev` (or a namespace on a shared
   Temporal — see Setup)
 - Ollama running locally with the model named by `EXTRACTION_MODEL`
@@ -63,7 +105,7 @@ not a production service.
   repository. Every stage that needs them fails loudly with the exact path
   it expected if they are absent.
 
-## 4. Setup
+## 5. Setup
 
 ```bash
 npm install
@@ -83,7 +125,7 @@ temporal operator namespace create pa-fhir-poc
 
 then set `TEMPORAL_NAMESPACE=pa-fhir-poc` in `.env`.
 
-## 5. Run the full chain
+## 6. Run the full chain
 
 Three terminals.
 
@@ -125,7 +167,25 @@ node cli.ts review-signal <workflowId> approve <your-name>
 node cli.ts project L33822
 ```
 
-## 6. Add a second LCD
+## 7. Validate conformance (optional — M6)
+
+The committed evidence in [`docs/conformance/L33822.md`](docs/conformance/L33822.md)
+already shows the verdicts; nothing below is required to use the repo. To
+reproduce them with the official HL7 validator (Docker runs it — no local
+Java needed):
+
+```bash
+./tools/fetch-validator.sh     # once; downloads the pinned validator_cli.jar
+node cli.ts validate L33822
+```
+
+The first run downloads the DTR IG package tree into `.fhir/` (gitignored);
+later runs are offline. The Questionnaire is validated against
+`dtr-std-questionnaire` from `hl7.fhir.us.davinci-dtr#2.2.0`, the
+PlanDefinition against base R4, and the CRD card is reported as skipped with
+the reason (it is a CDS Hooks logical model, not a FHIR resource).
+
+## 8. Add a second LCD
 
 The pipeline has no document-specific code — adding another LCD is a
 fixtures-only change:
@@ -136,11 +196,12 @@ fixtures-only change:
    bar for extraction (requirement count, category distribution, key
    phrases).
 3. Run the same commands from "Run the full chain" or the granular verbs,
-   substituting the new paths and ids.
+   substituting the new paths and ids — including `validate <lcdId>` if you
+   want the conformance verdict.
 
 No file under `src/` or `cli.ts` changes.
 
-## 7. Testing
+## 9. Testing
 
 ```bash
 npm test
@@ -150,24 +211,25 @@ npm run typecheck
 `npm test` includes M1's acceptance gate, which runs the live extraction
 model against the real L33822 PDF and takes roughly 40 seconds. Graph- and
 Temporal-backed tests need `docker compose up -d` and a reachable Temporal
-server, per Setup above.
+server, per Setup above. The validator is deliberately **not** part of
+`npm test` — its deterministic surface is tested, but no test needs Docker,
+Java, or the network.
 
-## 8. Graph model
+## 10. Repository tour
 
-```
-(LCD {id, title, version, status, sourceHash})-[:REQUIRES]->(Requirement {id, text, ordinal, category})
-(LCD)-[:COVERS]->(Code {system, code})
-(LCD)-[:HAS_ARTICLE]->(Article {id, title, version, sourceHash})
-(Article)-[:LISTS]->(Code)
-(Article)-[:DEFINES]->(DenialReason {id, text})
-```
+- `src/extract/` — PDF → text → sections → LLM → `Requirement[]`; the only
+  Ollama-aware file is `llm-client.ts`
+- `src/graph/` — schema/constraints, upsert, approved-subgraph read,
+  validation report
+- `src/workflow/` — Temporal review workflow, activities, worker, client
+- `src/fhir/` — the three artifact builders, `profiles.ts` (sole home of
+  every canonical URL), `validate.ts` (M6 runner)
+- `cli.ts` — the single orchestration entrypoint for every verb above
+- `docs/examples/` — committed artifacts; `docs/conformance/` — validator
+  evidence; `docs/backlog.md` — deliberate deferrals; `docs/plans/` —
+  per-milestone implementation plans
+- `PA-AI-POC-PLAN.md` — the original scope and milestone plan
 
-`Article` is its own node because ICD-10 codes and denial reasons are
-asserted by the policy article, not the LCD. `Code` is a single label
-(not split by system) with a composite key on `(system, code)`, since HCPCS
-and ICD-10 are the same kind of thing and FHIR models every coded value as
-`{system, code}`.
+## 11. License
 
-## 9. License
-
-MIT.
+[MIT](LICENSE).
