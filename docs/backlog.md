@@ -21,6 +21,19 @@ repo is its natural first real consumer:
   can consume `hl7.fhir.us.davinci-dtr#2.2.0` directly (or a FHIR Schema
   conversion of it exists), there is no input to generate from.
 
+## DTR Questionnaire sourcing beyond the documentation category
+
+After the second-LCD hardening pass, the `documentation` category contains
+exactly what the documents' DOCUMENTATION REQUIREMENTS sections state — which
+is the DME MACs' *shared* Standard Documentation boilerplate. Both demo LCDs
+therefore project near-identical 5-item questionnaires, while the clinically
+interesting attestations (AHI thresholds, adherence windows, diabetes
+criteria) live in `indication`-category requirements and surface only on the
+CRD card. A richer DTR Questionnaire would draw items from indication
+criteria too. That is a deliberate M4 design change (the plan says
+"documentation-category requirements"), so it is recorded here rather than
+made silently.
+
 ## Carried over from the POC plan (out of scope by design)
 
 - Executable CQL — `library` stays a stub canonical.

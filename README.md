@@ -6,9 +6,11 @@ between extraction and publication. Built as a public reference for Da Vinci
 Project members: it demonstrates the shape of a prior-authorization pipeline
 end to end — not a production service.
 
-L33822 (Glucose Monitors) and its policy article A52464 are the demonstration
-fixtures throughout; the pipeline itself is generic across any LCD/article
-pair ([add a second LCD](#8-add-a-second-lcd) is a fixtures-only change).
+L33822 (Glucose Monitors, article A52464) and L33718 (PAP Devices for
+Obstructive Sleep Apnea, article A52467) are the demonstration fixtures; the
+pipeline is generic across any LCD/article pair, and the second pair was
+added exactly as [add a second LCD](#8-add-a-second-lcd) prescribes — a
+fixtures-only change, no document-specific code.
 
 ```mermaid
 flowchart LR
@@ -33,27 +35,37 @@ reviewer's approval, recorded on the graph.
 
 ## 1. See the output without running anything
 
-The three artifacts projected from the reviewed L33822 graph are committed as
-[`docs/examples/`](docs/examples/):
+The three artifacts projected from each reviewed graph are committed as
+[`docs/examples/`](docs/examples/), for both demonstration LCDs:
 
-- [`L33822.dtr.json`](docs/examples/L33822.dtr.json) — DTR Questionnaire, one
+- [`L33822.dtr.json`](docs/examples/L33822.dtr.json) /
+  [`L33718.dtr.json`](docs/examples/L33718.dtr.json) — DTR Questionnaire, one
   boolean attestation item per documentation requirement.
-- [`L33822.crd.json`](docs/examples/L33822.crd.json) — CRD CDS Hooks card:
+- [`L33822.crd.json`](docs/examples/L33822.crd.json) /
+  [`L33718.crd.json`](docs/examples/L33718.crd.json) — CRD CDS Hooks card:
   covered HCPCS codes plus the requirement text a clinician would see.
-- [`L33822.plandefinition.json`](docs/examples/L33822.plandefinition.json) —
+- [`L33822.plandefinition.json`](docs/examples/L33822.plandefinition.json) /
+  [`L33718.plandefinition.json`](docs/examples/L33718.plandefinition.json) —
   PlanDefinition linking each covered code to the questionnaire.
 
 ## 2. What's proven vs. deliberately deferred
 
-**Proven**, on the real L33822 + A52464 documents:
+**Proven**, on two real LCD/article pairs (L33822 + A52464, L33718 + A52467):
 
 - The full PDF → graph → governed-review → FHIR chain, including the
   workflow's indefinite block on the human signal.
-- **IG conformance by the official HL7 validator** (M6): the DTR
-  Questionnaire validates against the DTR IG v2.2.0 `dtr-std-questionnaire`
-  StructureDefinition with **0 errors, 0 warnings**; the PlanDefinition
-  against base R4 with 0 errors. Full report, flags, and rationale:
-  [`docs/conformance/L33822.md`](docs/conformance/L33822.md).
+- **Generality**: the second pair (PAP devices — different clinical domain,
+  1 article-listed ICD-10 code where glucose monitoring has 461) went through
+  as a fixtures-only change. It also did exactly what a second document
+  should: it exposed two generic pipeline defects (PDF line-wrap fragments
+  masquerading as section headings; "covered codes" harvested from prose),
+  both fixed for all documents with regression tests — see
+  [`docs/conformance/L33718.md`](docs/conformance/L33718.md).
+- **IG conformance by the official HL7 validator** (M6), for both LCDs: each
+  DTR Questionnaire validates against the DTR IG v2.2.0
+  `dtr-std-questionnaire` StructureDefinition with **0 errors, 0 warnings**;
+  each PlanDefinition against base R4 with 0 errors. Full reports, flags, and
+  rationale: [`docs/conformance/`](docs/conformance/).
 - Correct absence of profiles where none exist: the CRD CDS Hooks card is a
   logical model under CRD v2.2.1 (not a FHIR resource), and no Da Vinci
   CRD/DTR profile exists for PlanDefinition. Both are verified findings, not
@@ -188,7 +200,8 @@ the reason (it is a CDS Hooks logical model, not a FHIR resource).
 ## 8. Add a second LCD
 
 The pipeline has no document-specific code — adding another LCD is a
-fixtures-only change:
+fixtures-only change. (This is not just a claim: L33718/A52467 was added this
+way — see [`docs/conformance/L33718.md`](docs/conformance/L33718.md).)
 
 1. Place the LCD PDF at `fixtures/<lcdId>.pdf` and its paired article PDF
    alongside it.

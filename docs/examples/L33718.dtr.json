@@ -1,0 +1,52 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "L33718",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/dtr-std-questionnaire"
+    ]
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Documentation attestation questionnaire generated from Medicare LCD L33718: 5 documentation requirements.</p></div>"
+  },
+  "url": "http://example.org/pa-fhir-poc/Questionnaire/L33718",
+  "name": "L33718",
+  "status": "active",
+  "subjectType": [
+    "Patient"
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/cqf-library",
+      "valueCanonical": "http://example.org/pa-fhir-poc/Library/L33718-cql-stub"
+    }
+  ],
+  "item": [
+    {
+      "linkId": "L33718-R101",
+      "text": "The beneficiary's medical records will reflect the need for the care provided",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33718-R102",
+      "text": "This documentation must be available upon request",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33718-R103",
+      "text": "Suppliers must meet the requirement for Medical Record Information (including continued need/use if applicable)",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33718-R104",
+      "text": "Suppliers must meet the requirement for Correct Coding",
+      "type": "boolean"
+    },
+    {
+      "linkId": "L33718-R105",
+      "text": "Suppliers must meet the requirement for Proof of Delivery",
+      "type": "boolean"
+    }
+  ]
+}

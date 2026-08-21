@@ -3,7 +3,7 @@
   "id": "L33822",
   "text": {
     "status": "generated",
-    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Prior-authorization plan generated from Medicare LCD L33822: 20 covered codes, each requiring the documentation questionnaire.</p></div>"
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Prior-authorization plan generated from Medicare LCD L33822: 31 covered codes, each requiring the documentation questionnaire.</p></div>"
   },
   "url": "http://example.org/pa-fhir-poc/PlanDefinition/L33822",
   "name": "L33822",
@@ -27,13 +27,13 @@
       "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
     },
     {
-      "title": "Documentation required for HCPCS A4271",
+      "title": "Documentation required for HCPCS A4244",
       "code": [
         {
           "coding": [
             {
               "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
-              "code": "A4271"
+              "code": "A4244"
             }
           ]
         }
@@ -41,13 +41,209 @@
       "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
     },
     {
-      "title": "Documentation required for HCPCS K0554",
+      "title": "Documentation required for HCPCS A4258",
       "code": [
         {
           "coding": [
             {
               "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
-              "code": "K0554"
+              "code": "A4258"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS A4247",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A4247"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS E2102",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "E2102"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS A4255",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A4255"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS A9275",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A9275"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS A4234",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A4234"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS E1399",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "E1399"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS A4233",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A4233"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS A4257",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A4257"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS A4250",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A4250"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS A4246",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A4246"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS A4245",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A4245"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS A4235",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A4235"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS E0620",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "E0620"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
+    },
+    {
+      "title": "Documentation required for HCPCS A4271",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A4271"
             }
           ]
         }
@@ -76,34 +272,6 @@
             {
               "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
               "code": "A9276"
-            }
-          ]
-        }
-      ],
-      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
-    },
-    {
-      "title": "Documentation required for HCPCS A9270",
-      "code": [
-        {
-          "coding": [
-            {
-              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
-              "code": "A9270"
-            }
-          ]
-        }
-      ],
-      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
-    },
-    {
-      "title": "Documentation required for HCPCS K0553",
-      "code": [
-        {
-          "coding": [
-            {
-              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
-              "code": "K0553"
             }
           ]
         }
@@ -258,20 +426,6 @@
             {
               "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
               "code": "E2100"
-            }
-          ]
-        }
-      ],
-      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33822"
-    },
-    {
-      "title": "Documentation required for HCPCS A9279",
-      "code": [
-        {
-          "coding": [
-            {
-              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
-              "code": "A9279"
             }
           ]
         }

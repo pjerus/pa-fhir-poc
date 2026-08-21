@@ -1,0 +1,324 @@
+{
+  "resourceType": "PlanDefinition",
+  "id": "L33718",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Prior-authorization plan generated from Medicare LCD L33718: 22 covered codes, each requiring the documentation questionnaire.</p></div>"
+  },
+  "url": "http://example.org/pa-fhir-poc/PlanDefinition/L33718",
+  "name": "L33718",
+  "status": "active",
+  "library": [
+    "http://example.org/pa-fhir-poc/Library/L33718-cql-stub"
+  ],
+  "action": [
+    {
+      "title": "Documentation required for HCPCS A7031",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7031"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7038",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7038"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7033",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7033"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7035",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7035"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7036",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7036"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS E0471",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "E0471"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7046",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7046"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS E0601",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "E0601"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A4604",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A4604"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7030",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7030"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7044",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7044"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7029",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7029"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7032",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7032"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7027",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7027"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7039",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7039"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7028",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7028"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS E0562",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "E0562"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS E0561",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "E0561"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7034",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7034"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7037",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7037"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS A7045",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "A7045"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    },
+    {
+      "title": "Documentation required for HCPCS E0470",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "E0470"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/L33718"
+    }
+  ]
+}
