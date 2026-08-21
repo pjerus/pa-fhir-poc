@@ -14,6 +14,7 @@ import { ensureConstraints } from './src/graph/schema.ts';
 import { loadSubgraph } from './src/graph/write.ts';
 import { validateGraph } from './src/graph/validate.ts';
 import { projectLcd } from './src/fhir/project.ts';
+import { validateProjection } from './src/fhir/validate.ts';
 import { awaitReview, signalReview, startReview } from './src/workflow/client.ts';
 import type { ArticleInput, CodeRef, LcdInput, ReviewDecision } from './src/types.ts';
 
@@ -30,6 +31,7 @@ const USAGE = `Usage:
   node cli.ts review-signal <workflowId> <approve|reject> <reviewer> [note]
                                                                 Deliver a human review decision to a running workflow
   node cli.ts project <lcdId>                                  Project an approved LCD to CRD/DTR/PlanDefinition FHIR artifacts
+  node cli.ts validate <lcdId>                                 Validate projected artifacts with the official HL7 validator (Docker; run tools/fetch-validator.sh once first)
   node cli.ts run <lcd.pdf> <article.pdf>                      Extract both, start review, block for a human signal, then project on approval
 
 Environment:
@@ -243,6 +245,22 @@ async function assertFileExists(path: string, label: string): Promise<void> {
   }
 }
 
+async function runValidate(args: readonly string[]): Promise<void> {
+  const [lcdId] = args;
+  if (lcdId === undefined) throw new Error(`validate needs an LCD id.\n\n${USAGE}`);
+
+  const results = await validateProjection(lcdId, OUT_DIR);
+
+  process.stdout.write('\n');
+  for (const { run, exitCode } of results) {
+    process.stdout.write(`${exitCode === 0 ? 'PASS' : `FAIL (exit ${exitCode})`}  ${run.artifactFile} — ${run.label}\n`);
+  }
+  process.stdout.write(
+    `SKIP  ${lcdId}.crd.json — CRD card is a CDS Hooks logical model under CRD v2.2.1, not a FHIR resource instance; no StructureDefinition applies.\n`,
+  );
+  if (results.some(({ exitCode }) => exitCode !== 0)) process.exitCode = 1;
+}
+
 async function runRun(args: readonly string[]): Promise<void> {
   const [lcdPath, articlePath] = args;
   if (lcdPath === undefined || articlePath === undefined) {
@@ -318,6 +336,9 @@ try {
       break;
     case 'project':
       await runProject(rest);
+      break;
+    case 'validate':
+      await runValidate(rest);
       break;
     case 'run':
       await runRun(rest);

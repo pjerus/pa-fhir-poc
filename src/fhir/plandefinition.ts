@@ -1,6 +1,7 @@
 import type { PlanDefinition, PlanDefinitionAction } from 'fhir/r4';
 
 import type { ApprovedSubgraph } from '../graph/read.ts';
+import { generatedNarrative } from './narrative.ts';
 import { codeSystemUri, instanceCanonical } from './profiles.ts';
 
 /**
@@ -21,6 +22,9 @@ export function buildPlanDefinition(subgraph: ApprovedSubgraph): PlanDefinition 
   return {
     resourceType: 'PlanDefinition',
     id: lcd.id,
+    text: generatedNarrative(
+      `Prior-authorization plan generated from Medicare LCD ${lcd.id}${lcd.title !== undefined ? ` (${lcd.title})` : ''}: ${action.length} covered code${action.length === 1 ? '' : 's'}, each requiring the documentation questionnaire.`,
+    ),
     url: instanceCanonical('PlanDefinition', lcd.id),
     ...(lcd.version !== undefined ? { version: lcd.version } : {}),
     ...(lcd.title !== undefined ? { title: lcd.title } : {}),

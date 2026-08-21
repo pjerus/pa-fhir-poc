@@ -20,6 +20,14 @@ test('buildPlanDefinition sets resourceType, status, url/version/title/name, and
   assert.ok(!('meta' in roundTripped));
 });
 
+test('buildPlanDefinition carries a generated narrative naming the LCD (dom-6 best practice)', () => {
+  const planDefinition = buildPlanDefinition(syntheticSubgraph());
+
+  assert.equal(planDefinition.text?.status, 'generated');
+  assert.match(planDefinition.text?.div ?? '', /TEST-P-LCD1/);
+  assert.match(planDefinition.text?.div ?? '', /^<div xmlns="http:\/\/www\.w3\.org\/1999\/xhtml">/);
+});
+
 test('buildPlanDefinition library deep-equals the CQL stub canonical', () => {
   const planDefinition = buildPlanDefinition(syntheticSubgraph());
   assert.deepEqual(planDefinition.library, [instanceCanonical('Library', 'TEST-P-LCD1-cql-stub')]);

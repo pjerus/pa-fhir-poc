@@ -4,3 +4,7 @@ out/
 
 # Human-supplied Medicare Coverage Database exports (see README) — not redistributed here.
 fixtures/*.pdf
+
+# M6 validator: pinned jar fetched by tools/fetch-validator.sh; IG package cache.
+tools/validator_cli.jar
+.fhir/

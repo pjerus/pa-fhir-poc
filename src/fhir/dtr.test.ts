@@ -48,6 +48,20 @@ test('buildDtrQuestionnaire sets resourceType, meta.profile, status, url/version
   assert.equal(questionnaire.id, 'TEST-P-LCD1');
 });
 
+test('buildDtrQuestionnaire declares Patient as the sole subject type (1..1 in dtr-base-questionnaire)', () => {
+  const questionnaire = buildDtrQuestionnaire(syntheticSubgraph());
+
+  assert.deepEqual(questionnaire.subjectType, ['Patient']);
+});
+
+test('buildDtrQuestionnaire carries a generated narrative naming the LCD (dom-6 best practice)', () => {
+  const questionnaire = buildDtrQuestionnaire(syntheticSubgraph());
+
+  assert.equal(questionnaire.text?.status, 'generated');
+  assert.match(questionnaire.text?.div ?? '', /TEST-P-LCD1/);
+  assert.match(questionnaire.text?.div ?? '', /^<div xmlns="http:\/\/www\.w3\.org\/1999\/xhtml">/);
+});
+
 test('buildDtrQuestionnaire carries a cqf-library extension pointing at the CQL stub canonical', () => {
   const questionnaire = buildDtrQuestionnaire(syntheticSubgraph());
 

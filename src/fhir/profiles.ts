@@ -9,6 +9,12 @@
 export const DTR_STD_QUESTIONNAIRE_PROFILE =
   'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/dtr-std-questionnaire';
 
+/** The IG package the M6 validator loads — same spec version the profile above comes from. */
+export const DTR_IG_PACKAGE = 'hl7.fhir.us.davinci-dtr#2.2.0';
+
+/** The FHIR core version every Da Vinci CRD/DTR artifact here targets. */
+export const FHIR_VERSION = '4.0.1';
+
 /** FHIR R4 core extension. */
 export const CQF_LIBRARY_EXTENSION = 'http://hl7.org/fhir/StructureDefinition/cqf-library';
 

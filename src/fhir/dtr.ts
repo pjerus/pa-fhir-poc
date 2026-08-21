@@ -1,6 +1,7 @@
 import type { Questionnaire, QuestionnaireItem } from 'fhir/r4';
 
 import type { ApprovedSubgraph } from '../graph/read.ts';
+import { generatedNarrative } from './narrative.ts';
 import { CQF_LIBRARY_EXTENSION, DTR_STD_QUESTIONNAIRE_PROFILE, instanceCanonical } from './profiles.ts';
 
 /**
@@ -23,11 +24,16 @@ export function buildDtrQuestionnaire(subgraph: ApprovedSubgraph): Questionnaire
     resourceType: 'Questionnaire',
     id: lcd.id,
     meta: { profile: [DTR_STD_QUESTIONNAIRE_PROFILE] },
+    text: generatedNarrative(
+      `Documentation attestation questionnaire generated from Medicare LCD ${lcd.id}${lcd.title !== undefined ? ` (${lcd.title})` : ''}: ${items.length} documentation requirement${items.length === 1 ? '' : 's'}.`,
+    ),
     url: instanceCanonical('Questionnaire', lcd.id),
     ...(lcd.version !== undefined ? { version: lcd.version } : {}),
     ...(lcd.title !== undefined ? { title: lcd.title } : {}),
     name: lcd.id,
     status: 'active',
+    // 1..1 in dtr-base-questionnaire; every requirement here attests facts about the beneficiary.
+    subjectType: ['Patient'],
     extension: [
       {
         url: CQF_LIBRARY_EXTENSION,
