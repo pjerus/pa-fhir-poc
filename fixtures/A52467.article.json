@@ -1,0 +1,33 @@
+{
+  "id": "A52467",
+  "listedCodes": [
+    {
+      "system": "ICD-10-CM",
+      "code": "G47.33"
+    }
+  ],
+  "denialReasons": [
+    {
+      "id": "A52467-D1",
+      "text": "Claims for A9279 (MONITORING FEATURE/DEVICE, STAND-ALONE OR INTEGRATED, ANY TYPE, INCLUDES ALL ACCESSORIES, COMPONENTS AND ELECTRONICS, NOT OTHERWISE CLASSIFIED) are denied as statutorily non-covered (No Medicare benefit)."
+    },
+    {
+      "id": "A52467-D2",
+      "text": "Claims for the specified items subject to Final Rule 1713 (84 Fed. Reg Vol 217) that do not meet the face-to-face encounter and WOPD requirements specified in the LCD-related Standard Documentation Requirements Article (A55426) will be denied as not reasonable and necessary."
+    },
+    {
+      "id": "A52467-D3",
+      "text": "If a supplier delivers an item prior to receipt of a WOPD, it will be denied as not reasonable and necessary."
+    },
+    {
+      "id": "A52467-D4",
+      "text": "If the WOPD is not obtained prior to delivery, payment will not be made for that item even if a WOPD is subsequently obtained by the supplier."
+    },
+    {
+      "id": "A52467-D5",
+      "text": "Claim lines billed without a GA, GZ or KX modifier will be rejected as missing information."
+    }
+  ],
+  "hcpcsCodes": [],
+  "sourceHash": "bea2840fbeb9d90dc3ed5dd480b6891e8c92be622d11d5e5b87b57b28cdf284f"
+}
