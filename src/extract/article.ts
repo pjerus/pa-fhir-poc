@@ -99,49 +99,60 @@ const HCPCS_HEADING_LABEL = 'CPT/HCPCS Codes';
 const CODING_GUIDELINES_HEADING = /(?:^|\n)[ \t]*CODING\s+GUIDELINES[ \t]*(?=\n|$)/i;
 const CODING_INFORMATION_HEADING = /Coding\s+Information/i;
 const HCPCS_EMPTY_WARNING =
-  `No HCPCS codes found under the "${HCPCS_HEADING_LABEL}" heading or its "Coding Guidelines" ` +
-  'fallback; recording an empty list rather than a stub.';
+  `No HCPCS codes found under the "${HCPCS_HEADING_LABEL}" heading; ` +
+  'recording an empty list rather than a stub.';
+const HCPCS_NO_HEADING_WARNING =
+  `No "${HCPCS_HEADING_LABEL}" heading found; recording an empty list rather than a stub.`;
+// The code table ends where the next top-level region begins. Searched after
+// the heading, because articles also carry a "General Information" block near
+// the top of the document.
+const HCPCS_REGION_END_HEADINGS: readonly RegExp[] = [
+  ICD10_SUPPORT_HEADING,
+  /General\s+Information/i,
+  /Associated\s+Information/i,
+];
 
 interface HcpcsResult {
   readonly codes: readonly CodeRef[];
   readonly warnings: readonly string[];
 }
 
+export interface HcpcsOptions {
+  /**
+   * Articles always carry the heading, so a miss there is a parse failure
+   * ('throw'). LCDs published after the 2019 MCD restructuring may delegate
+   * coding entirely to their article, so a missing heading in an LCD is a
+   * fact about the document ('warn').
+   */
+  readonly onMissingHeading?: 'throw' | 'warn';
+}
+
 /**
- * The primary HCPCS region runs from the end of the "CPT/HCPCS Codes"
- * heading to the start of the ICD-10 support-list heading. Some articles
- * (e.g. ones covering a device class rather than a single code) leave that
- * heading's own section "N/A" and instead fold the real HCPCS references
- * into prose under "Coding Guidelines" -- so an empty primary region falls
- * back to there. Only a missing "CPT/HCPCS Codes" heading altogether is a
- * parse failure; a heading that is genuinely followed by zero codes in both
- * places is a fact about the document, not a bug, so it is recorded as an
- * empty list with a warning instead of thrown.
+ * The HCPCS region runs from the end of the "CPT/HCPCS Codes" heading to the
+ * next top-level region heading. Only codes inside that explicit table count:
+ * prose mentions elsewhere (e.g. "Coding Guidelines") name non-covered and
+ * miscoded examples as often as covered items, so they are never a source of
+ * coverage facts. A heading genuinely followed by zero codes is recorded as
+ * an empty list with a warning instead of thrown.
  */
-export function extractHcpcsCodes(text: string): HcpcsResult {
+export function extractHcpcsCodes(text: string, options: HcpcsOptions = {}): HcpcsResult {
   const heading = firstMatch(text, HCPCS_HEADING);
   if (heading === null) {
+    if (options.onMissingHeading === 'warn') {
+      return { codes: [], warnings: [HCPCS_NO_HEADING_WARNING] };
+    }
     throw new Error(`Could not find a "${HCPCS_HEADING_LABEL}" heading in the article.`);
   }
 
-  const icd10SupportStart = firstMatch(text, ICD10_SUPPORT_HEADING)?.start ?? text.length;
-  const primaryRegion = text.slice(heading.end, Math.max(heading.end, icd10SupportStart));
-  const primaryCodes = tokensMatching(primaryRegion, HCPCS_CODE_SHAPE);
-  if (primaryCodes.length > 0) {
-    return { codes: primaryCodes.map((code) => ({ system: 'HCPCS', code })), warnings: [] };
-  }
-
-  const guidelines = firstMatch(text, CODING_GUIDELINES_HEADING);
-  if (guidelines === null) {
+  const rest = text.slice(heading.end);
+  const regionEnd = Math.min(
+    ...HCPCS_REGION_END_HEADINGS.map((pattern) => firstMatch(rest, pattern)?.start ?? rest.length),
+  );
+  const codes = tokensMatching(rest.slice(0, regionEnd), HCPCS_CODE_SHAPE);
+  if (codes.length === 0) {
     return { codes: [], warnings: [HCPCS_EMPTY_WARNING] };
   }
-  const codingInfoStart = firstMatch(text, CODING_INFORMATION_HEADING)?.start ?? icd10SupportStart;
-  const fallbackRegion = text.slice(guidelines.end, Math.max(guidelines.end, codingInfoStart));
-  const fallbackCodes = tokensMatching(fallbackRegion, HCPCS_CODE_SHAPE);
-  if (fallbackCodes.length === 0) {
-    return { codes: [], warnings: [HCPCS_EMPTY_WARNING] };
-  }
-  return { codes: fallbackCodes.map((code) => ({ system: 'HCPCS', code })), warnings: [] };
+  return { codes: codes.map((code) => ({ system: 'HCPCS', code })), warnings: [] };
 }
 
 const NON_MEDICAL_NECESSITY_HEADING = /NON-?MEDICAL\s+NECESSITY/i;

@@ -49,6 +49,7 @@ function extractedSnapshot(lcdId: string) {
     lcdId,
     sourceHash: `${lcdId}-hash`,
     requirements: [{ id: `${lcdId}-R1`, text: 'Requirement one', ordinal: 1, category: 'indication' }],
+    hcpcsCodes: [],
     warnings: [],
   };
 }

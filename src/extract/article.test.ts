@@ -103,28 +103,10 @@ test('extractHcpcsCodes: throws naming the heading when it is not found', () => 
   assert.throws(() => extractHcpcsCodes(text), /CPT\/HCPCS Codes/i);
 });
 
-test('extractHcpcsCodes: falls back to the Coding Guidelines section when the primary region has zero codes', () => {
+test('extractHcpcsCodes: prose mentions outside the code table are never coverage facts', () => {
   const text = [
     'CODING GUIDELINES',
-    'For claims use code K9814 and code K9813 for the supply allowance.',
-    'Coding Information',
-    'CPT/HCPCS Codes',
-    'N/A',
-  ].join('\n');
-
-  assert.deepEqual(extractHcpcsCodes(text), {
-    codes: [
-      { system: 'HCPCS', code: 'K9814' },
-      { system: 'HCPCS', code: 'K9813' },
-    ],
-    warnings: [],
-  });
-});
-
-test('extractHcpcsCodes: returns an empty list with a warning when both the primary region and the fallback are empty', () => {
-  const text = [
-    'CODING GUIDELINES',
-    'This section describes general billing rules with no codes listed.',
+    'Claims for K9814 are denied as statutorily non-covered; K9813 is incorrect coding.',
     'Coding Information',
     'CPT/HCPCS Codes',
     'N/A',
@@ -135,6 +117,36 @@ test('extractHcpcsCodes: returns an empty list with a warning when both the prim
   assert.deepEqual(result.codes, []);
   assert.equal(result.warnings.length, 1);
   assert.match(result.warnings[0] ?? '', /no hcpcs codes found/i);
+});
+
+test('extractHcpcsCodes: bounded by the next top-level region heading in an LCD-shaped document', () => {
+  const text = [
+    'CPT/HCPCS Codes',
+    'Group 1 Codes',
+    'E9819 TEST DEVICE, EACH',
+    'A9801 TEST SUPPLY, EACH',
+    'General Information',
+    'Associated Information',
+    'B9999 mentioned in prose must not be counted',
+  ].join('\n');
+
+  assert.deepEqual(extractHcpcsCodes(text), {
+    codes: [
+      { system: 'HCPCS', code: 'E9819' },
+      { system: 'HCPCS', code: 'A9801' },
+    ],
+    warnings: [],
+  });
+});
+
+test('extractHcpcsCodes: a missing heading warns instead of throwing when the caller opts in', () => {
+  const text = ['No relevant headings here.', 'Just some prose.'].join('\n');
+
+  const result = extractHcpcsCodes(text, { onMissingHeading: 'warn' });
+
+  assert.deepEqual(result.codes, []);
+  assert.equal(result.warnings.length, 1);
+  assert.match(result.warnings[0] ?? '', /no "CPT\/HCPCS Codes" heading/i);
 });
 
 // ---- parseArticleText (denial reasons + full assembly) ---------------------

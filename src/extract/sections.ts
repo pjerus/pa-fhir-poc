@@ -21,6 +21,13 @@ const HEADING_PATTERNS: ReadonlyArray<readonly [SectionName, RegExp]> = [
 
 const MAX_HEADING_WORDS = 12;
 
+// MCD PDF exports hard-wrap prose, so a mid-sentence fragment can land on its
+// own short line ("of 10 events and documentation of:"). True headings start
+// with a capital and name their section within the first few words; fragments
+// start lowercase, with a digit, or a quote, or bury the keyword mid-sentence
+// ("Refer to Coverage Indications, ...").
+const KEYWORD_WORD_WINDOW = 3;
+
 // Revision-history tables repeat INDICATION/LIMITATION-style labels far more
 // often than a real heading recurs in the same document; past this count a
 // verbatim-matching heading candidate is treated as a recurring table label.
@@ -34,13 +41,15 @@ const REVISION_HISTORY_HEADING = /revision history/i;
  */
 function isHeadingLike(line: string): boolean {
   if (line === '' || line.endsWith('.')) return false;
+  if (!/^[A-Z]/.test(line)) return false;
   return line.split(/\s+/).length <= MAX_HEADING_WORDS;
 }
 
 /** A heading may name several sections ("Indications, Limitations, and/or..."). */
 function headingsFor(line: string): readonly SectionName[] {
   if (!isHeadingLike(line)) return [];
-  return HEADING_PATTERNS.filter(([, pattern]) => pattern.test(line)).map(([name]) => name);
+  const head = line.split(/\s+/).slice(0, KEYWORD_WORD_WINDOW).join(' ');
+  return HEADING_PATTERNS.filter(([, pattern]) => pattern.test(head)).map(([name]) => name);
 }
 
 /**

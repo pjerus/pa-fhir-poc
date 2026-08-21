@@ -113,11 +113,29 @@ async function readExtractedSnapshot(lcdId: string): Promise<ExtractionResult> {
     !isRecord(parsed) ||
     typeof parsed.lcdId !== 'string' ||
     typeof parsed.sourceHash !== 'string' ||
-    !Array.isArray(parsed.requirements)
+    !Array.isArray(parsed.requirements) ||
+    !Array.isArray(parsed.hcpcsCodes)
   ) {
-    throw new Error(`Malformed extraction snapshot at ${path}: expected lcdId, sourceHash, and requirements.`);
+    throw new Error(
+      `Malformed extraction snapshot at ${path}: expected lcdId, sourceHash, requirements, and ` +
+        'hcpcsCodes. A snapshot from an older pipeline lacks hcpcsCodes; re-run: node cli.ts extract <path-to-lcd.pdf>',
+    );
   }
   return parsed as unknown as ExtractionResult;
+}
+
+/** Coverage facts split unpredictably between an LCD and its article; COVERS is their union. */
+function unionCodes(first: readonly CodeRef[], second: readonly CodeRef[]): CodeRef[] {
+  const seen = new Set<string>();
+  const out: CodeRef[] = [];
+  for (const code of [...first, ...second]) {
+    const key = `${code.system}|${code.code}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      out.push(code);
+    }
+  }
+  return out;
 }
 
 interface ArticleSnapshot {
@@ -166,9 +184,7 @@ async function runLoad(args: readonly string[]): Promise<void> {
     id: snapshot.lcdId,
     sourceHash: snapshot.sourceHash,
     requirements: snapshot.requirements,
-    // Covered codes flow from the paired article's HCPCS listing; an LCD
-    // loaded without an article has none.
-    coveredCodes: articleSnapshot?.hcpcsCodes ?? [],
+    coveredCodes: unionCodes(snapshot.hcpcsCodes, articleSnapshot?.hcpcsCodes ?? []),
   };
 
   const graph = createGraph(loadGraphConfig());
@@ -193,9 +209,7 @@ async function runReviewStart(args: readonly string[]): Promise<void> {
     id: snapshot.lcdId,
     sourceHash: snapshot.sourceHash,
     requirements: snapshot.requirements,
-    // Covered codes flow from the paired article's HCPCS listing; an LCD
-    // loaded without an article has none.
-    coveredCodes: articleSnapshot?.hcpcsCodes ?? [],
+    coveredCodes: unionCodes(snapshot.hcpcsCodes, articleSnapshot?.hcpcsCodes ?? []),
   };
 
   const workflowId = await startReview(
@@ -277,8 +291,7 @@ async function runRun(args: readonly string[]): Promise<void> {
     id: lcdResult.lcdId,
     sourceHash: lcdResult.sourceHash,
     requirements: lcdResult.requirements,
-    // Covered codes flow from the paired article's HCPCS listing, same as review-start.
-    coveredCodes: articleResult.hcpcsCodes,
+    coveredCodes: unionCodes(lcdResult.hcpcsCodes, articleResult.hcpcsCodes),
   };
   const article: ArticleInput = {
     id: articleResult.id,

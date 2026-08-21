@@ -62,6 +62,15 @@ function responseSchema(categories: readonly RequirementCategory[]): unknown {
   };
 }
 
+const CATEGORY_DEFINITIONS: Readonly<Record<RequirementCategory, string>> = {
+  indication:
+    'a clinical or eligibility criterion the beneficiary must meet for the item to qualify for coverage',
+  documentation:
+    'an obligation to create, retain, or produce records or evidence',
+  limitation:
+    'a restriction, exclusion, quantity cap, or condition under which the item is denied',
+};
+
 function buildPrompt(body: string, categories: readonly RequirementCategory[]): string {
   return [
     'You are extracting discrete coverage requirements from a Medicare coverage policy.',
@@ -69,6 +78,9 @@ function buildPrompt(body: string, categories: readonly RequirementCategory[]): 
     'Return ONLY a JSON object of the form:',
     '{"requirements":[{"text":"<one requirement, verbatim or lightly normalised>",' +
       `"category":"<one of: ${categories.join(', ')}>"}]}`,
+    '',
+    'Categories:',
+    ...categories.map((category) => `- ${category}: ${CATEGORY_DEFINITIONS[category]}`),
     '',
     'Rules:',
     '- One entry per discrete, independently checkable obligation.',

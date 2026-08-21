@@ -40,6 +40,7 @@ function extractedSnapshot(lcdId: string) {
       { id: `${lcdId}-R1`, text: 'Requirement one', ordinal: 1, category: 'indication' },
       { id: `${lcdId}-R2`, text: 'Requirement two', ordinal: 2, category: 'documentation' },
     ],
+    hcpcsCodes: [],
     warnings: [],
   };
 }

@@ -45,5 +45,7 @@ test('carries requirements and section warnings through to the result', async ()
   );
   assert.deepEqual(result.warnings, [
     'No "limitations" heading found; downstream extraction will skip that section.',
+    'No "CPT/HCPCS Codes" heading found; recording an empty list rather than a stub.',
   ]);
+  assert.deepEqual(result.hcpcsCodes, []);
 });

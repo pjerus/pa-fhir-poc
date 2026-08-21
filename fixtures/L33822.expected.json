@@ -1,6 +1,6 @@
 {
-  "requirementCount": 37,
-  "categoryDistribution": { "indication": 19, "documentation": 14, "limitation": 4 },
+  "requirementCount": 67,
+  "categoryDistribution": { "indication": 34, "limitation": 28, "documentation": 5 },
   "keyPhrases": [
     "has diabetes",
     "frequency of blood glucose testing",

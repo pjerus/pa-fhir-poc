@@ -59,6 +59,62 @@ test('feeds a combined heading to every section it names', () => {
   assert.equal(sections.documentation, 'The treating order must be retained and available on request.');
 });
 
+test('a hard-wrapped fragment starting lowercase is never a heading', () => {
+  const text = [
+    'Indications',
+    'The AHI is greater than or equal to 5 with a minimum',
+    'of 10 events and documentation of:',
+    'Excessive daytime sleepiness or impaired cognition',
+  ].join('\n');
+
+  const { sections } = splitSections(text);
+
+  assert.equal(sections.documentation, null);
+  assert.ok(sections.indications?.includes('Excessive daytime sleepiness'));
+});
+
+test('a line starting with a digit or a quote is never a heading', () => {
+  const text = [
+    'Indications',
+    '1, 2008, documentation of clinical benefit is demonstrated by:',
+    '"Coverage Indications, Limitations and/or Medical Necessity"',
+    'The criteria of both policies must be met.',
+  ].join('\n');
+
+  const { sections } = splitSections(text);
+
+  assert.equal(sections.documentation, null);
+  assert.equal(sections.limitations, null);
+  assert.ok(sections.indications?.includes('The criteria of both policies must be met.'));
+});
+
+test('a cross-reference naming a section deep in the line is not a heading', () => {
+  const text = [
+    'Indications',
+    'The device is covered when the criteria below are met.',
+    'Refer to Coverage Indications, Limitations, and/or Medical',
+    'Necessity for other coverage criteria',
+  ].join('\n');
+
+  const { sections } = splitSections(text);
+
+  assert.equal(sections.limitations, null);
+  assert.ok(sections.indications?.includes('Necessity for other coverage criteria'));
+});
+
+test('a heading may carry a qualifier prefix before its section word', () => {
+  const text = [
+    'Indications',
+    'Coverage criteria text.',
+    'POLICY SPECIFIC DOCUMENTATION REQUIREMENTS',
+    'The order must be retained.',
+  ].join('\n');
+
+  const { sections } = splitSections(text);
+
+  assert.equal(sections.documentation, 'The order must be retained.');
+});
+
 test('warns instead of crashing when a section heading is absent', () => {
   const text = ['Indications', 'The patient must have a documented diagnosis.'].join('\n');
 
