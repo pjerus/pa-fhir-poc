@@ -21,11 +21,10 @@ export interface ApprovedSubgraph {
 }
 
 /**
- * Reads the approved subgraph for one LCD: requirements ordered by ordinal,
- * covered codes, and (if the LCD has one) its paired article. This is the
- * read side M4's FHIR projection leans on — it never returns a draft LCD.
+ * Reads the subgraph for one LCD regardless of status.
+ * Used by the review screen to inspect draft or approved content.
  */
-export async function readApprovedSubgraph(graph: Graph, lcdId: string): Promise<ApprovedSubgraph> {
+export async function readSubgraph(graph: Graph, lcdId: string): Promise<ApprovedSubgraph> {
   const [lcdRow] = await graph.run(`MATCH (lcd:${NODE.LCD} {id: $lcdId}) RETURN properties(lcd) AS lcd`, {
     lcdId,
   });
@@ -40,11 +39,6 @@ export async function readApprovedSubgraph(graph: Graph, lcdId: string): Promise
     status: LcdStatus;
     sourceHash: string;
   };
-  if (lcd.status !== 'approved') {
-    throw new Error(
-      `LCD "${lcdId}" is not approved (status: "${lcd.status}") — its review has not been approved.`,
-    );
-  }
 
   const requirementRows = await graph.run(
     `
@@ -115,4 +109,19 @@ export async function readApprovedSubgraph(graph: Graph, lcdId: string): Promise
     coveredCodes,
     ...(article !== undefined ? { article } : {}),
   };
+}
+
+/**
+ * Reads the approved subgraph for one LCD: requirements ordered by ordinal,
+ * covered codes, and (if the LCD has one) its paired article. This is the
+ * read side M4's FHIR projection leans on — it never returns a draft LCD.
+ */
+export async function readApprovedSubgraph(graph: Graph, lcdId: string): Promise<ApprovedSubgraph> {
+  const subgraph = await readSubgraph(graph, lcdId);
+  if (subgraph.lcd.status !== 'approved') {
+    throw new Error(
+      `LCD "${subgraph.lcd.id}" is not approved (status: "${subgraph.lcd.status}") — its review has not been approved.`,
+    );
+  }
+  return subgraph;
 }

@@ -6,7 +6,7 @@ import { createGraph } from './db.ts';
 import type { Graph } from './db.ts';
 import { ensureConstraints } from './schema.ts';
 import { loadSubgraph } from './write.ts';
-import { readApprovedSubgraph } from './read.ts';
+import { readApprovedSubgraph, readSubgraph } from './read.ts';
 import type { ArticleInput, LcdInput } from '../types.ts';
 
 let graph: Graph;
@@ -134,6 +134,34 @@ test('readApprovedSubgraph throws naming the actual status when the LCD is not a
       assert.ok(error instanceof Error);
       assert.match(error.message, /draft/);
       assert.match(error.message, /its review has not been approved/);
+      return true;
+    },
+  );
+});
+
+test('readSubgraph returns a draft LCD without requiring approval', async () => {
+  await cleanupTestData();
+  await loadSubgraph(graph, { lcd: lcdFixture() }); // stays 'draft'
+
+  const subgraph = await readSubgraph(graph, 'TEST-R-L1');
+
+  assert.equal(subgraph.lcd.id, 'TEST-R-L1');
+  assert.equal(subgraph.lcd.status, 'draft');
+  assert.deepEqual(
+    subgraph.requirements.map((r) => r.id),
+    ['TEST-R-L1-R1', 'TEST-R-L1-R2'],
+  );
+});
+
+test('readSubgraph throws when the LCD is absent', async () => {
+  await cleanupTestData();
+
+  await assert.rejects(
+    () => readSubgraph(graph, 'TEST-R-MISSING'),
+    (error: unknown) => {
+      assert.ok(error instanceof Error);
+      assert.match(error.message, /TEST-R-MISSING/);
+      assert.match(error.message, /not found in the graph/);
       return true;
     },
   );
