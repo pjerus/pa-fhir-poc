@@ -15,9 +15,11 @@ test('throws an actionable error naming the PDF that is missing', async () => {
   );
 });
 
-// test/fixtures/two-page-policy.pdf is a 978-byte generated PDF: page 1 holds
-// "Indications", page 2 holds "Documentation Requirements", each with one line
-// of body text. It exists so this adapter can be tested without a real LCD.
+// test/fixtures/two-page-policy.pdf is a generated PDF (see
+// test/support/generate-fixtures.ts): page 1 opens with the MAC dialect
+// banner then "Indications", page 2 holds "Documentation Requirements", each
+// with one line of body text. It exists so this adapter can be tested
+// without a real LCD.
 test('extracts text from every page of a PDF', async () => {
   const { pages, totalPages, text } = await extractPdfText('test/fixtures/two-page-policy.pdf');
 

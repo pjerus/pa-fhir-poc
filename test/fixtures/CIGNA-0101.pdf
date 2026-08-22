@@ -1,0 +1,84 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 410 >>
+stream
+BT /F1 12 Tf 72 720 Td (Medical Coverage Policy) Tj
+0 -16 Td (Effective Date 1/1/2026) Tj
+0 -16 Td (Coverage Policy Number 0101) Tj
+0 -16 Td (Table of Contents) Tj
+0 -16 Td (Overview ................................ 2) Tj
+0 -16 Td (Coverage Policy ......................... 2) Tj
+0 -16 Td (INSTRUCTIONS FOR USE) Tj
+0 -16 Td (Coverage determinations require consideration of the applicable plan document.) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 445 >>
+stream
+BT /F1 12 Tf 72 720 Td (Overview) Tj
+0 -16 Td (This Coverage Policy addresses widget therapy.) Tj
+0 -16 Td (Coverage Policy) Tj
+0 -16 Td (Widget therapy is considered medically necessary when ALL of the following are met:) Tj
+0 -16 Td (documented diagnosis of testitis) Tj
+0 -16 Td (documentation that demonstrates conservative therapy failure) Tj
+0 -16 Td (Widget removal as a stand-alone procedure is considered not medically necessary.) Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 777 >>
+stream
+BT /F1 12 Tf 72 720 Td (Coding Information) Tj
+0 -16 Td (Notes:) Tj
+0 -16 Td (Considered Medically Necessary when criteria in the applicable policy statements listed above are met:) Tj
+0 -16 Td (CPT Codes Description) Tj
+0 -16 Td (12345 Widget implantation) Tj
+0 -16 Td (A1234 Widget device) Tj
+0 -16 Td (Considered Not Medically Necessary when used to report widget removal as a stand-alone procedure:) Tj
+0 -16 Td (23456 Widget removal) Tj
+0 -16 Td (Considered Experimental/Investigational/Unproven for the treatment of testitis:) Tj
+0 -16 Td (34567 Widget ablation) Tj
+0 -16 Td (General Background) Tj
+0 -16 Td (Literature review noise that must not bleed into requirements.) Tj
+0 -16 Td (References) Tj
+0 -16 Td (Revision Details) Tj
+0 -16 Td (Annual review 1/1/2026) Tj
+ET
+endstream
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000127 00000 n 
+0000000197 00000 n 
+0000000323 00000 n 
+0000000784 00000 n 
+0000000910 00000 n 
+0000001406 00000 n 
+0000001532 00000 n 
+trailer
+<< /Size 10 /Root 1 0 R >>
+startxref
+2360
+%%EOF
