@@ -85,6 +85,7 @@ npx tsc --noEmit                            # typecheck (npm run typecheck)
 node cli.ts extract <lcd.pdf>               # M1, implemented: prints Requirement[], snapshots to fixtures/
 node cli.ts load <lcdId> [articleId]        # M2, implemented: snapshot -> graph upsert -> validation report (exit 1 if unclean)
 node src/workflow/worker.ts                 # M3, implemented: review worker (blocks; run in its own terminal)
+node src/ui/server.ts                       # review console UI on 127.0.0.1:$UI_PORT (blocks; run from repo root in its own terminal)
 node cli.ts review-start <lcdId> [articleId]        # M3, implemented: starts review workflow, prints workflow id
 node cli.ts review-signal <wfId> <approve|reject> <reviewer> [note]   # M3, implemented
 node cli.ts extract-article <article.pdf>   # M2, implemented: ICD-10/HCPCS deterministic + denial reasons via LLM -> fixtures/<id>.article.json

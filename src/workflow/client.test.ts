@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { withWorkerTimeout } from './client.ts';
+import { dedupeByWorkflowId, withWorkerTimeout } from './client.ts';
 
 // Pure logic only — no live Temporal. Covers the race between a settling
 // promise and the client-side timeout, per the plan's Task 4 Step 2.
@@ -20,4 +20,16 @@ test('withWorkerTimeout returns worker-unavailable when the promise never settle
 test('withWorkerTimeout rethrows a rejection from the promise', async () => {
   const boom = new Error('boom');
   await assert.rejects(withWorkerTimeout(Promise.reject(boom), 1000), boom);
+});
+
+test('dedupeByWorkflowId keeps the first (most recent) execution per workflow id', () => {
+  const deduped = dedupeByWorkflowId([
+    { workflowId: 'review-TEST-L1', status: 'RUNNING' },
+    { workflowId: 'review-TEST-L1', status: 'COMPLETED' },
+    { workflowId: 'review-TEST-L2', status: 'COMPLETED' },
+  ]);
+  assert.deepEqual(deduped, [
+    { workflowId: 'review-TEST-L1', status: 'RUNNING' },
+    { workflowId: 'review-TEST-L2', status: 'COMPLETED' },
+  ]);
 });

@@ -179,6 +179,16 @@ node cli.ts review-signal <workflowId> approve <your-name>
 node cli.ts project L33822
 ```
 
+Prefer a browser over Terminals B and C? Start the review console
+(Terminal A's worker still required) and open http://127.0.0.1:8006 —
+upload the LCD/article PDF pair, watch extraction and review phases
+advance, approve or reject with a note, and download the projected
+artifacts:
+
+```bash
+node src/ui/server.ts    # blocks; run from the repo root in its own terminal
+```
+
 ## 7. Validate conformance (optional — M6)
 
 The committed evidence in [`docs/conformance/L33822.md`](docs/conformance/L33822.md)

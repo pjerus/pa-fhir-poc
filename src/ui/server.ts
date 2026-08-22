@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { createServer } from 'node:http';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -292,6 +293,10 @@ const SIGNAL_ROUTE = /^\/api\/reviews\/([^/]+)\/signal$/;
 const PROJECT_ROUTE = /^\/api\/lcds\/([^/]+)\/project$/;
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  // Same lazy .env loading the graph/workflow configs use — UI_PORT and the
+  // Ollama settings are read from process.env before any config call runs.
+  if (existsSync('.env')) process.loadEnvFile('.env');
+
   const indexHtml = await readFile(fileURLToPath(new URL('./index.html', import.meta.url)), 'utf8');
 
   const deps: ServerDeps = {

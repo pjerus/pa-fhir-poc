@@ -90,7 +90,25 @@ export interface ReviewWorkflowInfo {
   readonly status: WorkflowRuntimeStatus;
 }
 
-/** Lists every review workflow execution (any status) via server-side visibility. */
+/**
+ * Visibility lists *executions*, so a workflow id that has been re-run (a new
+ * review after a completed one) appears once per run. Keep only the first
+ * occurrence per id — the list arrives most-recent-first, so first wins.
+ * Pure and exported for unit tests.
+ */
+export function dedupeByWorkflowId(infos: readonly ReviewWorkflowInfo[]): ReviewWorkflowInfo[] {
+  const seen = new Set<string>();
+  const out: ReviewWorkflowInfo[] = [];
+  for (const info of infos) {
+    if (!seen.has(info.workflowId)) {
+      seen.add(info.workflowId);
+      out.push(info);
+    }
+  }
+  return out;
+}
+
+/** Lists review workflows via server-side visibility, one entry per workflow id (latest run). */
 export async function listReviewWorkflows(): Promise<ReviewWorkflowInfo[]> {
   const { address, namespace } = loadTemporalConfig();
 
@@ -101,7 +119,7 @@ export async function listReviewWorkflows(): Promise<ReviewWorkflowInfo[]> {
     for await (const execution of client.workflow.list({ query: "WorkflowType = 'reviewLcd'" })) {
       infos.push({ workflowId: execution.workflowId, status: toRuntimeStatus(execution.status.name) });
     }
-    return infos;
+    return dedupeByWorkflowId(infos);
   } finally {
     await connection.close();
   }
