@@ -49,7 +49,7 @@ function firstMatch(text: string, pattern: RegExp): FlatMatch | null {
  * or period (a list item, a sentence) is only recognised when the
  * punctuation itself isn't glued onto the token by the source text.
  */
-function tokensMatching(text: string, shape: RegExp): string[] {
+export function tokensMatching(text: string, shape: RegExp): string[] {
   const seen = new Set<string>();
   const tokens: string[] = [];
   for (const token of text.split(/\s+/)) {
