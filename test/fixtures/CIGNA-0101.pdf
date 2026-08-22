@@ -45,11 +45,12 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
 endobj
 9 0 obj
-<< /Length 777 >>
+<< /Length 791 >>
 stream
 BT /F1 12 Tf 72 720 Td (Coding Information) Tj
 0 -16 Td (Notes:) Tj
-0 -16 Td (Considered Medically Necessary when criteria in the applicable policy statements listed above are met:) Tj
+0 -16 Td (Considered Medically Necessary when criteria in the applicable policy statements listed) Tj
+0 -16 Td (above are met:) Tj
 0 -16 Td (CPT Codes Description) Tj
 0 -16 Td (12345 Widget implantation) Tj
 0 -16 Td (A1234 Widget device) Tj
@@ -80,5 +81,5 @@ xref
 trailer
 << /Size 10 /Root 1 0 R >>
 startxref
-2360
+2374
 %%EOF

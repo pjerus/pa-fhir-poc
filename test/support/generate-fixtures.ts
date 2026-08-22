@@ -46,7 +46,11 @@ const CIGNA_PAGES: ReadonlyArray<readonly string[]> = [
   [
     'Coding Information',
     'Notes:',
-    'Considered Medically Necessary when criteria in the applicable policy statements listed above are met:',
+    // Wrapped: makePdf draws one unbroken Tj per array entry, and a single
+    // line past ~100 proportional-width characters gets silently clipped by
+    // pdf.js's text extraction. Keep long lines split like this one.
+    'Considered Medically Necessary when criteria in the applicable policy statements listed',
+    'above are met:',
     'CPT Codes Description',
     '12345 Widget implantation',
     'A1234 Widget device',

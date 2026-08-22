@@ -83,7 +83,9 @@ export async function readExtractedSnapshot(lcdId: string): Promise<ExtractionRe
         'hcpcsCodes. A snapshot from an older pipeline lacks hcpcsCodes; re-run: node cli.ts extract <path-to-lcd.pdf>',
     );
   }
-  return parsed as unknown as ExtractionResult;
+  const result = parsed as unknown as ExtractionResult;
+  // Snapshots written before the dialect seam are all MAC by construction.
+  return result.dialect === undefined ? { ...result, dialect: 'mac' } : result;
 }
 
 interface ArticleSnapshotFile {

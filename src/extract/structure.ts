@@ -11,6 +11,7 @@ const CATEGORY_BY_SECTION: Readonly<Record<SectionName, RequirementCategory>> = 
 export interface StructureInput {
   readonly lcdId: string;
   readonly sections: SectionMap;
+  readonly documentName: string;
 }
 
 interface Block {
@@ -71,9 +72,13 @@ const CATEGORY_DEFINITIONS: Readonly<Record<RequirementCategory, string>> = {
     'a restriction, exclusion, quantity cap, or condition under which the item is denied',
 };
 
-function buildPrompt(body: string, categories: readonly RequirementCategory[]): string {
+function buildPrompt(
+  body: string,
+  categories: readonly RequirementCategory[],
+  documentName: string,
+): string {
   return [
-    'You are extracting discrete coverage requirements from a Medicare coverage policy.',
+    `You are extracting discrete coverage requirements from a ${documentName}.`,
     '',
     'Return ONLY a JSON object of the form:',
     '{"requirements":[{"text":"<one requirement, verbatim or lightly normalised>",' +
@@ -151,10 +156,14 @@ function reasonOf(error: unknown): string {
 }
 
 /** One retry, then surrender loudly — never a partial or invented result. */
-async function requestRequirements(block: Block, llm: LlmClient): Promise<ParsedRequirement[]> {
+async function requestRequirements(
+  block: Block,
+  documentName: string,
+  llm: LlmClient,
+): Promise<ParsedRequirement[]> {
   const { categories } = block;
   const schema = responseSchema(categories);
-  const prompt = buildPrompt(block.body, categories);
+  const prompt = buildPrompt(block.body, categories, documentName);
 
   const first = await llm.complete({ prompt, schema });
   try {
@@ -193,7 +202,7 @@ export async function structureRequirements(
   const requirements: Requirement[] = [];
 
   for (const block of blocksOf(input.sections)) {
-    for (const parsed of await requestRequirements(block, llm)) {
+    for (const parsed of await requestRequirements(block, input.documentName, llm)) {
       const ordinal = requirements.length + 1;
       requirements.push({
         id: `${input.lcdId}-R${ordinal}`,

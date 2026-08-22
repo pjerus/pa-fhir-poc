@@ -43,6 +43,7 @@ function waitUntil(predicate: () => boolean, timeoutMs = 2000): Promise<void> {
 function extractionResult(lcdId: string): ExtractionResult {
   return {
     lcdId,
+    dialect: 'mac',
     sourceHash: `hash-${lcdId}`,
     requirements: [{ id: `${lcdId}-R1`, text: 'req one', ordinal: 1, category: 'indication' }],
     hcpcsCodes: [{ system: 'HCPCS', code: 'E0100' }],
