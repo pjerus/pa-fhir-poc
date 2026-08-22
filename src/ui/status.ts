@@ -1,17 +1,6 @@
 import type { Job, JobStatus } from './jobs.ts';
-
-// NOTE: Local literal-union aliases (same members as Tasks 3/4, but defined locally
-// to avoid import dependency on client.ts which is modified concurrently).
-// Structural typing keeps them compatible.
-export type ReviewStatus = 'proposing' | 'validating' | 'awaiting-review';
-export type WorkflowRuntimeStatus =
-  | 'RUNNING'
-  | 'COMPLETED'
-  | 'FAILED'
-  | 'CANCELLED'
-  | 'TERMINATED'
-  | 'CONTINUED_AS_NEW'
-  | 'TIMED_OUT';
+import type { ReviewStatus } from '../workflow/review.workflow.ts';
+import type { WorkflowRuntimeStatus } from '../workflow/client.ts';
 
 export interface WorkflowSnapshot {
   readonly workflowId: string;

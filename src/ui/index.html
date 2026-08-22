@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PA-FHIR-POC Review Console</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+  h1 { font-size: 1.4rem; }
+  h2 { font-size: 1.1rem; margin-top: 2rem; }
+  table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+  th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid #ddd; font-size: 0.9rem; }
+  .badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 1rem; font-size: 0.8rem; background: #eee; }
+  .badge-terminal-ok { background: #d4f5d4; }
+  .badge-terminal-bad { background: #f5d4d4; }
+  .badge-waiting { background: #fff3c4; }
+  .error-text { color: #a00; font-size: 0.85rem; }
+  .hint { color: #666; font-size: 0.85rem; font-style: italic; }
+  form.upload label { display: block; margin: 0.4rem 0 0.1rem; font-size: 0.9rem; }
+  fieldset { margin-top: 1.5rem; }
+  section#review, section#artifacts { border: 1px solid #ddd; padding: 1rem; margin-top: 1rem; border-radius: 4px; }
+  .req-group h3 { margin-bottom: 0.2rem; font-size: 1rem; }
+  .code-list { font-family: monospace; font-size: 0.85rem; }
+  pre { background: #f7f7f7; padding: 0.6rem; overflow-x: auto; font-size: 0.8rem; }
+  button { cursor: pointer; }
+</style>
+</head>
+<body>
+  <h1>Review Console</h1>
+  <p class="hint">Drives the LCD/article pipeline from PDF upload through human review to FHIR artifacts. Not a replacement for Temporal Web (workflow visibility) or Neo4j Browser (graph inspection).</p>
+
+  <fieldset>
+    <legend>Upload an LCD + article pair</legend>
+    <form class="upload" id="upload-form">
+      <label for="lcdPdf">LCD PDF</label>
+      <input type="file" id="lcdPdf" name="lcdPdf" accept="application/pdf" required />
+      <label for="articlePdf">Article PDF</label>
+      <input type="file" id="articlePdf" name="articlePdf" accept="application/pdf" required />
+      <button type="submit">Start pipeline</button>
+      <span id="upload-status" class="hint"></span>
+    </form>
+  </fieldset>
+
+  <h2>Runs</h2>
+  <table id="runs-table">
+    <thead>
+      <tr><th>LCD</th><th>Phase</th><th>Note</th><th>Action</th></tr>
+    </thead>
+    <tbody id="runs-body"></tbody>
+  </table>
+
+  <section id="review" hidden>
+    <h2>Review</h2>
+    <div id="review-content"></div>
+  </section>
+
+  <section id="artifacts" hidden>
+    <h2>Artifacts</h2>
+    <div id="artifacts-content"></div>
+  </section>
+
+<script>
+(() => {
+  const FAST_MS = 2500;
+  const SLOW_MS = 15000;
+  const FAST_PHASES = new Set(['extracting', 'starting-review', 'proposing', 'validating']);
+  const SLOW_PHASES = new Set(['awaiting-review', 'worker-unavailable']);
+  const TERMINAL_PHASES = new Set(['failed', 'approved', 'rejected', 'workflow-failed']);
+
+  const runsBody = document.getElementById('runs-body');
+  const uploadForm = document.getElementById('upload-form');
+  const uploadStatus = document.getElementById('upload-status');
+  const reviewSection = document.getElementById('review');
+  const reviewContent = document.getElementById('review-content');
+  const artifactsSection = document.getElementById('artifacts');
+  const artifactsContent = document.getElementById('artifacts-content');
+
+  let pollTimer = null;
+  let lastEntries = [];
+
+  function el(tag, props, children) {
+    const node = document.createElement(tag);
+    if (props) {
+      for (const [key, value] of Object.entries(props)) {
+        if (key === 'text') node.textContent = value;
+        else node.setAttribute(key, value);
+      }
+    }
+    for (const child of children ?? []) node.appendChild(child);
+    return node;
+  }
+
+  function badgeClassFor(phase) {
+    if (phase === 'approved') return 'badge badge-terminal-ok';
+    if (phase === 'failed' || phase === 'rejected' || phase === 'workflow-failed') return 'badge badge-terminal-bad';
+    if (SLOW_PHASES.has(phase)) return 'badge badge-waiting';
+    return 'badge';
+  }
+
+  async function fetchJson(url, options) {
+    const response = await fetch(url, options);
+    const body = await response.json().catch(() => ({}));
+    return { ok: response.ok, status: response.status, body };
+  }
+
+  function renderRuns(entries) {
+    runsBody.textContent = '';
+    for (const entry of entries) {
+      const row = el('tr', {});
+      row.appendChild(el('td', { text: entry.lcdId }));
+      row.appendChild(el('td', {}, [el('span', { class: badgeClassFor(entry.phase), text: entry.phase })]));
+
+      const noteCell = el('td', {});
+      if (entry.error) noteCell.appendChild(el('span', { class: 'error-text', text: entry.error }));
+      if (entry.phase === 'worker-unavailable') {
+        noteCell.appendChild(el('span', { class: 'hint', text: 'worker down — run: node src/workflow/worker.ts' }));
+      }
+      row.appendChild(noteCell);
+
+      const actionCell = el('td', {});
+      if (entry.phase === 'awaiting-review' && entry.workflowId) {
+        const link = el('button', { type: 'button', text: 'Review' });
+        link.addEventListener('click', () => openReview(entry.workflowId));
+        actionCell.appendChild(link);
+      } else if (entry.phase === 'approved') {
+        const button = el('button', { type: 'button', text: 'Generate artifacts' });
+        button.addEventListener('click', () => generateArtifacts(entry.lcdId));
+        actionCell.appendChild(button);
+      } else if (entry.phase === 'failed') {
+        // Re-POSTing the originally uploaded files isn't possible from here —
+        // this is a hint to re-upload, not a button that pretends to retry.
+        actionCell.appendChild(el('span', { class: 'hint', text: 're-upload to retry' }));
+      }
+      row.appendChild(actionCell);
+
+      runsBody.appendChild(row);
+    }
+  }
+
+  function pickDelay(entries) {
+    if (entries.length === 0) return FAST_MS;
+    const phases = entries.map((e) => e.phase);
+    if (phases.every((p) => TERMINAL_PHASES.has(p))) return null;
+    if (phases.some((p) => FAST_PHASES.has(p))) return FAST_MS;
+    return SLOW_MS;
+  }
+
+  async function pollOnce() {
+    const { ok, body } = await fetchJson('/api/runs');
+    if (!ok) return;
+    lastEntries = body;
+    renderRuns(body);
+    schedulePoll();
+  }
+
+  function schedulePoll() {
+    if (pollTimer !== null) clearTimeout(pollTimer);
+    if (document.hidden) return;
+    const delay = pickDelay(lastEntries);
+    if (delay === null) return;
+    pollTimer = setTimeout(pollOnce, delay);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (pollTimer !== null) clearTimeout(pollTimer);
+      pollTimer = null;
+    } else {
+      pollOnce();
+    }
+  });
+
+  uploadForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    uploadStatus.textContent = 'uploading…';
+    const formData = new FormData(uploadForm);
+    const { ok, status, body } = await fetchJson('/api/runs', { method: 'POST', body: formData });
+    if (!ok) {
+      uploadStatus.textContent = `error (${status}): ${body.error ?? 'upload failed'}`;
+      return;
+    }
+    uploadStatus.textContent = `started job ${body.jobId}`;
+    uploadForm.reset();
+    pollOnce();
+  });
+
+  function requirementGroups(requirements) {
+    const byCategory = new Map();
+    for (const requirement of requirements) {
+      if (!byCategory.has(requirement.category)) byCategory.set(requirement.category, []);
+      byCategory.get(requirement.category).push(requirement);
+    }
+    return byCategory;
+  }
+
+  function renderCodeList(codes) {
+    const list = el('ul', { class: 'code-list' });
+    for (const code of codes) list.appendChild(el('li', { text: `${code.system} ${code.code}` }));
+    return list;
+  }
+
+  async function openReview(workflowId) {
+    const { ok, status, body } = await fetchJson(`/api/reviews/${encodeURIComponent(workflowId)}`);
+    reviewSection.hidden = false;
+    reviewContent.textContent = '';
+    if (!ok) {
+      reviewContent.appendChild(el('p', { class: 'error-text', text: `(${status}) ${body.error ?? 'failed to load review'}` }));
+      return;
+    }
+
+    const subgraph = body;
+    reviewContent.appendChild(el('h3', { text: `${subgraph.lcd.id} — status: ${subgraph.lcd.status}` }));
+
+    const groups = requirementGroups(subgraph.requirements);
+    for (const [category, items] of groups) {
+      const group = el('div', { class: 'req-group' });
+      group.appendChild(el('h3', { text: category }));
+      const list = el('ul');
+      for (const requirement of items) list.appendChild(el('li', { text: requirement.text }));
+      group.appendChild(list);
+      reviewContent.appendChild(group);
+    }
+
+    reviewContent.appendChild(el('h3', { text: 'Covered codes' }));
+    reviewContent.appendChild(renderCodeList(subgraph.coveredCodes));
+
+    if (subgraph.article) {
+      reviewContent.appendChild(el('h3', { text: `Article ${subgraph.article.id} — listed codes` }));
+      reviewContent.appendChild(renderCodeList(subgraph.article.listedCodes));
+
+      reviewContent.appendChild(el('h3', { text: 'Denial reasons' }));
+      const denialList = el('ul');
+      for (const reason of subgraph.article.denialReasons) denialList.appendChild(el('li', { text: reason.text }));
+      reviewContent.appendChild(denialList);
+    }
+
+    const reviewerInput = el('input', { type: 'text', placeholder: 'reviewer (required)', required: 'required' });
+    const noteInput = el('input', { type: 'text', placeholder: 'note (optional)' });
+    const approveButton = el('button', { type: 'button', text: 'Approve' });
+    const rejectButton = el('button', { type: 'button', text: 'Reject' });
+    const signalStatus = el('span', { class: 'hint' });
+
+    async function sendDecision(decision) {
+      if (!reviewerInput.value.trim()) {
+        signalStatus.textContent = 'reviewer is required';
+        return;
+      }
+      approveButton.disabled = true;
+      rejectButton.disabled = true;
+      const payload = { decision, reviewer: reviewerInput.value.trim() };
+      if (noteInput.value.trim()) payload.note = noteInput.value.trim();
+      const { ok, status, body: result } = await fetchJson(`/api/reviews/${encodeURIComponent(workflowId)}/signal`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!ok) {
+        signalStatus.textContent = status === 409 ? (result.error ?? 'already decided') : `error (${status}): ${result.error ?? 'signal failed'}`;
+        approveButton.disabled = false;
+        rejectButton.disabled = false;
+        return;
+      }
+      signalStatus.textContent = `recorded: ${decision}`;
+      pollOnce();
+    }
+
+    approveButton.addEventListener('click', () => sendDecision('approve'));
+    rejectButton.addEventListener('click', () => sendDecision('reject'));
+
+    const form = el('div', {}, [reviewerInput, noteInput, approveButton, rejectButton, signalStatus]);
+    reviewContent.appendChild(form);
+  }
+
+  function downloadLink(lcdId, key, artifact) {
+    const blob = new Blob([JSON.stringify(artifact, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = el('a', { href: url, download: `${lcdId}.${key}.json`, text: 'download' });
+    return link;
+  }
+
+  async function generateArtifacts(lcdId) {
+    const { ok, status, body } = await fetchJson(`/api/lcds/${encodeURIComponent(lcdId)}/project`, { method: 'POST' });
+    artifactsSection.hidden = false;
+    artifactsContent.textContent = '';
+    if (!ok) {
+      artifactsContent.appendChild(el('p', { class: 'error-text', text: `(${status}) ${body.error ?? 'project failed'}` }));
+      return;
+    }
+
+    for (const key of ['crd', 'dtr', 'planDefinition']) {
+      const details = el('details');
+      const summary = el('summary', { text: key });
+      details.appendChild(summary);
+      details.appendChild(downloadLink(lcdId, key, body.artifacts[key]));
+      const pre = el('pre', { text: JSON.stringify(body.artifacts[key], null, 2) });
+      details.appendChild(pre);
+      artifactsContent.appendChild(details);
+    }
+  }
+
+  pollOnce();
+})();
+</script>
+</body>
+</html>
