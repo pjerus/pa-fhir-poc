@@ -4,8 +4,9 @@ import { basename, extname } from 'node:path';
 import type { CodeRef, Requirement } from '../types.ts';
 import { extractHcpcsCodes } from './article.ts';
 import type { LlmClient } from './llm-client.ts';
+import { MAC_VOCABULARY } from './dialects/mac.ts';
 import { extractPdfText } from './pdf-text.ts';
-import { cutAtRevisionHistory, splitSections } from './sections.ts';
+import { cutAtTerminal, splitSections } from './sections.ts';
 import { structureRequirements } from './structure.ts';
 
 export interface ExtractionResult {
@@ -30,9 +31,9 @@ export function lcdIdFromPath(pdfPath: string): string {
 export async function extractLcd(pdfPath: string, llm: LlmClient): Promise<ExtractionResult> {
   const lcdId = lcdIdFromPath(pdfPath);
   const { text } = await extractPdfText(pdfPath);
-  const { sections, warnings } = splitSections(text);
+  const { sections, warnings } = splitSections(text, MAC_VOCABULARY);
   const requirements = await structureRequirements({ lcdId, sections }, llm);
-  const hcpcs = extractHcpcsCodes(cutAtRevisionHistory(text), { onMissingHeading: 'warn' });
+  const hcpcs = extractHcpcsCodes(cutAtTerminal(text, MAC_VOCABULARY.terminal), { onMissingHeading: 'warn' });
 
   return {
     lcdId,
