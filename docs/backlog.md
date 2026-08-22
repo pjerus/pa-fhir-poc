@@ -17,9 +17,23 @@ repo is its natural first real consumer:
   the generated schema's verdicts. Where the Zod layer passes something the
   validator rejects, that's a finding *for fhir-zod-gen* (its v0.1 skips
   FHIRPath invariants, slicing, and terminology-backed bindings by design).
-- **Blocked on:** fhir-zod-gen roadmap #1 — IG package resolution. Until it
-  can consume `hl7.fhir.us.davinci-dtr#2.2.0` directly (or a FHIR Schema
-  conversion of it exists), there is no input to generate from.
+- **Update 2026-08-22:** IG package resolution has landed in fhir-zod-gen —
+  `fhir-zod-gen hl7.fhir.us.davinci-dtr#2.2.0 --skip-terminology` now
+  generates a `DTRStdQuestionnaireSchema` end-to-end. Running it against
+  this repo's own validator-PASS artifacts (`out/L33822.dtr.json`,
+  `out/L33718.dtr.json`) surfaced two false-rejection bugs in the generator
+  itself — filed upstream as
+  [fhir-zod-gen#23](https://github.com/pjerus/fhir-zod-gen/issues/23)
+  (`extension` resolves as scalar instead of `0..*` array) and
+  [fhir-zod-gen#24](https://github.com/pjerus/fhir-zod-gen/issues/24)
+  (a primitive element carrying an extension slice, e.g. `item.text`, emits
+  as `z.object()` instead of its real primitive type). Both were already
+  independently found and root-caused by the same author's IG-examples
+  validation sweep the day before; this just adds a second, independent
+  confirmation from a different IG.
+- **Blocked on:** the two issues above landing upstream. Once fixed, redo
+  this generation and re-run `safeParse()` against the real projected
+  artifacts before wiring the guardrail into `projectLcd()`.
 
 ## DTR Questionnaire sourcing beyond the documentation category
 
