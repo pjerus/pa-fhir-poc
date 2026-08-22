@@ -12,7 +12,7 @@ import type { Graph } from '../graph/db.ts';
 import { ensureConstraints } from '../graph/schema.ts';
 import type { LoadSubgraphInput } from '../graph/write.ts';
 import * as activities from './activities.ts';
-import { reviewLcd, reviewSignal } from './review.workflow.ts';
+import { reviewLcd, reviewSignal, reviewStatusQuery } from './review.workflow.ts';
 import type { LcdInput } from '../types.ts';
 
 const TASK_QUEUE = 'test';
@@ -148,6 +148,44 @@ test('approve path commits the LCD and records review provenance', async () => {
   } finally {
     await cleanupTestData();
   }
+});
+
+test('reviewStatus query reports proposing -> validating -> awaiting-review', async () => {
+  const lcdId = 'TEST-F-L4';
+
+  // Mocked activities (no graph I/O) — this test is about the query's status
+  // transitions, not the propose/validate/commit side effects already
+  // covered by the tests above.
+  const mockActivities: typeof activities = {
+    propose: async () => {},
+    validate: async () => {},
+    commit: async () => {},
+    compensate: async () => {},
+  };
+  const worker = await Worker.create({
+    connection: testEnv.nativeConnection,
+    namespace: testEnv.namespace ?? 'default',
+    taskQueue: TASK_QUEUE,
+    workflowsPath: WORKFLOWS_PATH,
+    activities: mockActivities,
+  });
+
+  const result = await worker.runUntil(async () => {
+    const handle = await testEnv.client.workflow.start(reviewLcd, {
+      taskQueue: TASK_QUEUE,
+      workflowId: `review-${lcdId}`,
+      args: [subgraphInput(lcdId)],
+    });
+
+    await waitUntil(async () => (await handle.query(reviewStatusQuery)) === 'awaiting-review');
+    assert.equal(await handle.query(reviewStatusQuery), 'awaiting-review');
+
+    await handle.signal(reviewSignal, { decision: 'approve', reviewer: 'TEST-F-Carol' });
+
+    return handle.result();
+  });
+
+  assert.deepEqual(result, { lcdId, outcome: 'approved' });
 });
 
 test('reject path leaves the LCD draft and records review provenance', async () => {

@@ -1,4 +1,4 @@
-import { condition, defineSignal, proxyActivities, setHandler } from '@temporalio/workflow';
+import { condition, defineQuery, defineSignal, proxyActivities, setHandler } from '@temporalio/workflow';
 
 import type { LoadSubgraphInput } from '../graph/write.ts';
 import type { ReviewDecision } from '../types.ts';
@@ -12,7 +12,11 @@ export interface ReviewResult {
   readonly outcome: 'approved' | 'rejected';
 }
 
+/** Finer-grained than `describe()`'s coarse RUNNING/COMPLETED/... status. */
+export type ReviewStatus = 'proposing' | 'validating' | 'awaiting-review';
+
 export const reviewSignal = defineSignal<[ReviewDecision]>('review');
+export const reviewStatusQuery = defineQuery<ReviewStatus>('reviewStatus');
 
 const { propose, validate, commit, compensate } = proxyActivities<typeof activities>({
   startToCloseTimeout: '1 minute',
@@ -32,8 +36,13 @@ export async function reviewLcd(input: ReviewInput): Promise<ReviewResult> {
     decision = signaled;
   });
 
+  let status: ReviewStatus = 'proposing';
+  setHandler(reviewStatusQuery, () => status);
+
   await propose(input);
+  status = 'validating';
   await validate(lcdId);
+  status = 'awaiting-review';
 
   await condition(() => decision !== undefined);
 
