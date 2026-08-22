@@ -204,8 +204,11 @@ Same discipline as the existing fixtures:
 - M1 acceptance gate: `fixtures/CIGNA-0158.expected.json` joins the
   live-model gate in `npm test`; ground truth derived by line-by-line
   review of the extraction against the source PDF, as for both MACs.
-- `npm test` stays free of Docker/Java/network; absent PDF fails with
-  the fetch-script message.
+- `npm test` stays free of Docker/Java/network. A fetch-gated fixture
+  PDF that is absent makes the M1 gate *skip loudly* (naming the fetch
+  script) rather than fail — a fresh clone must not fail `npm test` over
+  a deliberately-uncommitted copyrighted PDF. CLI verbs still fail loud
+  on a missing PDF.
 
 ## Out of scope
 
