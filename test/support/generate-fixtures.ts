@@ -31,6 +31,8 @@ const CIGNA_PAGES: ReadonlyArray<readonly string[]> = [
     'Table of Contents',
     'Overview ................................ 2',
     'Coverage Policy ......................... 2',
+    'Coding Information ...................... 3',
+    'General Background ...................... 3',
     'INSTRUCTIONS FOR USE',
     'Coverage determinations require consideration of the applicable plan document.',
   ],

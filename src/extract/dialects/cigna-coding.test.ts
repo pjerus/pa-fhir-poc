@@ -26,6 +26,24 @@ const SAMPLE = [
   'Widget therapy 12399 mentioned in prose must not be harvested.',
 ].join('\n');
 
+test('page-1 TOC entries never anchor the coding region', () => {
+  // Real 0158 regression: the TOC lists both region headings with dot
+  // leaders and page numbers before the real sections appear.
+  const withToc = [
+    'Table of Contents',
+    'Coding Information ............................ 4',
+    'General Background ............................ 6',
+    SAMPLE,
+  ].join('\n');
+  const { coveredCodes, denialReasons } = parseCignaCodingInformation(withToc, 'CIGNA-0101');
+  assert.deepEqual(coveredCodes, [
+    { system: 'CPT', code: '12345' },
+    { system: 'CPT', code: '12346' },
+    { system: 'HCPCS', code: 'A1234' },
+  ]);
+  assert.equal(denialReasons.length, 3);
+});
+
 test('MN table codes become covered codes with shape-derived systems', () => {
   const { coveredCodes } = parseCignaCodingInformation(SAMPLE, 'CIGNA-0101');
   assert.deepEqual(coveredCodes, [

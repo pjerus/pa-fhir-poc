@@ -7,8 +7,32 @@ export interface DialectCoding {
   readonly warnings: readonly string[];
 }
 
-const CODING_INFORMATION_HEADING = /Coding\s+Information/i;
-const REGION_END_HEADING = /General\s+Background/i;
+// Region bounds are located as whole-line exact headings, not flat-text
+// matches: the page-1 table of contents repeats both headings with trailing
+// dot leaders and page numbers ("Coding Information ......... 4"), and a
+// flat match would anchor the region on that TOC sliver.
+const CODING_INFORMATION_HEADING = /^Coding\s+Information$/i;
+const REGION_END_HEADING = /^General\s+Background$/i;
+
+interface HeadingLine {
+  /** Char offset of the line's start within the searched text. */
+  readonly start: number;
+  /** Char offset just past the line (past its newline, or end of text). */
+  readonly end: number;
+}
+
+/** First line that IS the heading (trimmed, whole line) — TOC entries never match. */
+function findHeadingLine(text: string, pattern: RegExp): HeadingLine | null {
+  let offset = 0;
+  for (const line of text.split('\n')) {
+    const lineEnd = offset + line.length;
+    if (pattern.test(line.trim())) {
+      return { start: offset, end: Math.min(lineEnd + 1, text.length) };
+    }
+    offset = lineEnd + 1;
+  }
+  return null;
+}
 
 // Stance-statement openers. Order matters: "Not Medically Necessary" must be
 // tried before "Medically Necessary" so the longer phrase wins.
@@ -52,13 +76,13 @@ interface StanceSentence {
  * LLM is involved.
  */
 export function parseCignaCodingInformation(cutText: string, lcdId: string): DialectCoding {
-  const headingMatch = CODING_INFORMATION_HEADING.exec(cutText);
-  if (headingMatch === null) {
+  const heading = findHeadingLine(cutText, CODING_INFORMATION_HEADING);
+  if (heading === null) {
     throw new Error('Could not find a "Coding Information" heading in the policy document.');
   }
-  const afterHeading = cutText.slice(headingMatch.index + headingMatch[0].length);
-  const endMatch = REGION_END_HEADING.exec(afterHeading);
-  const region = endMatch === null ? afterHeading : afterHeading.slice(0, endMatch.index);
+  const afterHeading = cutText.slice(heading.end);
+  const endHeading = findHeadingLine(afterHeading, REGION_END_HEADING);
+  const region = endHeading === null ? afterHeading : afterHeading.slice(0, endHeading.start);
 
   const sentences: StanceSentence[] = [];
   STATEMENT_START.lastIndex = 0;
