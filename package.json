@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "POC: Medicare LCD coverage-policy PDF -> Neo4j graph -> Temporal human-gated review -> Da Vinci CRD/DTR FHIR artifacts",
+  "description": "POC: payer coverage-policy PDF (Medicare LCD or commercial) -> Neo4j graph -> Temporal human-gated review -> Da Vinci CRD/DTR FHIR artifacts",
   "license": "MIT",
   "engines": {
     "node": ">=22.18"

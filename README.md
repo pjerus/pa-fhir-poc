@@ -1,20 +1,25 @@
 # pa-fhir-poc
 
-A proof of concept that turns a Medicare Local Coverage Determination (LCD)
-PDF into Da Vinci CRD/DTR FHIR artifacts, with a durable human-gated review
-between extraction and publication. Built as a public reference for Da Vinci
-Project members: it demonstrates the shape of a prior-authorization pipeline
-end to end — not a production service.
+A proof of concept that turns payer coverage-policy PDFs — Medicare Local
+Coverage Determinations (LCDs) and commercial policies alike — into Da Vinci
+CRD/DTR FHIR artifacts, with a durable human-gated review between extraction
+and publication. Built as a public reference for Da Vinci Project members:
+it demonstrates the shape of a prior-authorization pipeline end to end — not
+a production service.
 
-L33822 (Glucose Monitors, article A52464) and L33718 (PAP Devices for
-Obstructive Sleep Apnea, article A52467) are the demonstration fixtures; the
-pipeline is generic across any LCD/article pair, and the second pair was
-added exactly as [add a second LCD](#8-add-a-second-lcd) prescribes — a
-fixtures-only change, no document-specific code.
+Three policies are the demonstration fixtures: Medicare LCDs L33822
+(Glucose Monitors, article A52464) and L33718 (PAP Devices for Obstructive
+Sleep Apnea, article A52467), plus Cigna Medical Coverage Policy 0158
+(Surgical Treatments for Obstructive Sleep Apnea) — a single-document
+commercial policy handled through a per-publisher dialect profile. The
+second LCD was added exactly as [add another policy](#8-add-another-policy)
+prescribes — a fixtures-only change, no document-specific code; the Cigna
+policy cost one dialect profile in `src/extract/dialects/` and nothing
+downstream of extraction.
 
 ```mermaid
 flowchart LR
-    PDF["LCD + article PDFs"] --> EX["LLM extraction<br/>(Ollama, local only)"]
+    PDF["policy PDFs<br/>(LCD + article, or a single<br/>commercial document)"] --> EX["LLM extraction<br/>(Ollama, local only)"]
     EX --> SNAP["fixtures/ snapshots<br/>(deterministic boundary)"]
     SNAP --> G[("Neo4j graph")]
     G --> REV{"Temporal review<br/>human approve / reject"}
@@ -59,22 +64,42 @@ requires at least one item; see
 
 ## 2. What's proven vs. deliberately deferred
 
-**Proven**, on two real LCD/article pairs (L33822 + A52464, L33718 + A52467):
+**Proven**, on three real policies from two publishers — MAC LCD/article
+pairs (L33822 + A52464, L33718 + A52467) and a commercial single-document
+policy (CIGNA-0158):
 
 - The full PDF → graph → governed-review → FHIR chain, including the
   workflow's indefinite block on the human signal.
-- **Generality**: the second pair (PAP devices — different clinical domain,
-  1 article-listed ICD-10 code where glucose monitoring has 461) went through
-  as a fixtures-only change. It also did exactly what a second document
-  should: it exposed two generic pipeline defects (PDF line-wrap fragments
-  masquerading as section headings; "covered codes" harvested from prose),
-  both fixed for all documents with regression tests — see
+- **Generality within a publisher**: the second pair (PAP devices —
+  different clinical domain, 1 article-listed ICD-10 code where glucose
+  monitoring has 461) went through as a fixtures-only change. It also did
+  exactly what a second document should: it exposed two generic pipeline
+  defects (PDF line-wrap fragments masquerading as section headings;
+  "covered codes" harvested from prose), both fixed for all documents with
+  regression tests — see
   [`docs/conformance/L33718.md`](docs/conformance/L33718.md).
+- **Generality across publishers**: CIGNA-0158 is a structurally different
+  document — no companion article, zero ICD-10 codes, and CPT/HCPCS code
+  tables whose headings *are* the coverage stances. It went in as a
+  per-publisher **dialect profile** (`src/extract/dialects/`, sniffed from
+  the PDF's page-1 banner and cross-checked against the filename) plus
+  fixtures; everything downstream of extraction consumes the same
+  payer-neutral shapes and was untouched. Denial reasons come out of the
+  stance-stratified tables deterministically — no LLM. Design:
+  [`docs/superpowers/specs/2026-08-22-payer-dialect-seam-design.md`](docs/superpowers/specs/2026-08-22-payer-dialect-seam-design.md).
+- **Honest projection over convenient output**: CIGNA-0158 states no
+  documentation requirements, so it projects **no** DTR Questionnaire —
+  `dtr-std-questionnaire` requires `item` 1..*, and fabricating one to fill
+  the slot would be inventing policy. The CRD card says "coverage criteria
+  apply" with no questionnaire link, and `validate` reports the absence as
+  an explained skip:
+  [`docs/conformance/CIGNA-0158.md`](docs/conformance/CIGNA-0158.md).
 - **IG conformance by the official HL7 validator** (M6), for both LCDs: each
   DTR Questionnaire validates against the DTR IG v2.2.0
   `dtr-std-questionnaire` StructureDefinition with **0 errors, 0 warnings**;
-  each PlanDefinition against base R4 with 0 errors. Full reports, flags, and
-  rationale: [`docs/conformance/`](docs/conformance/).
+  each PlanDefinition against base R4 with 0 errors. CIGNA-0158's
+  PlanDefinition likewise passes base R4 with 0 errors. Full reports, flags,
+  and rationale: [`docs/conformance/`](docs/conformance/).
 - Correct absence of profiles where none exist: the CRD CDS Hooks card is a
   logical model under CRD v2.2.1 (not a FHIR resource), and no Da Vinci
   CRD/DTR profile exists for PlanDefinition. Both are verified findings, not
@@ -119,10 +144,11 @@ projecting a draft throws.
   Temporal — see Setup)
 - Ollama running locally with the model named by `EXTRACTION_MODEL`
   (default `qwen3.8:27b`) pulled
-- The two source PDFs: `fixtures/L33822.pdf` (the LCD) and
-  `fixtures/A52464.pdf` (its paired policy article). These are "Create PDF"
-  exports from the Medicare Coverage Database (MCD), a dynamic search UI —
-  they cannot be fetched programmatically and are not redistributed in this
+- The MAC source PDFs: `fixtures/L33822.pdf` + `fixtures/A52464.pdf`, and
+  (for the second pair) `fixtures/L33718.pdf` + `fixtures/A52467.pdf` —
+  each LCD with its paired policy article. These are "Create PDF" exports
+  from the Medicare Coverage Database (MCD), a dynamic search UI — they
+  cannot be fetched programmatically and are not redistributed in this
   repository. Every stage that needs them fails loudly with the exact path
   it expected if they are absent.
 - **Third fixture (CIGNA-0158, single-document dialect):** unlike the
@@ -227,22 +253,34 @@ later runs are offline. The Questionnaire is validated against
 PlanDefinition against base R4, and the CRD card is reported as skipped with
 the reason (it is a CDS Hooks logical model, not a FHIR resource).
 
-## 8. Add a second LCD
+## 8. Add another policy
 
-The pipeline has no document-specific code — adding another LCD is a
-fixtures-only change. (This is not just a claim: L33718/A52467 was added this
-way — see [`docs/conformance/L33718.md`](docs/conformance/L33718.md).)
+The pipeline has no document-specific code. What a new policy costs depends
+on whether its publisher's format is already known:
 
-1. Place the LCD PDF at `fixtures/<lcdId>.pdf` and its paired article PDF
-   alongside it.
-2. Hand-author `fixtures/<lcdId>.expected.json` describing the acceptance
+**Same publisher format (a new MAC LCD, another Cigna policy) — fixtures
+only.** This is not just a claim: L33718/A52467 was added this way — see
+[`docs/conformance/L33718.md`](docs/conformance/L33718.md).
+
+1. Place the policy PDF at `fixtures/<policyId>.pdf`, and its paired article
+   PDF alongside it if the dialect uses one (MAC does; Cigna does not).
+2. Hand-author `fixtures/<policyId>.expected.json` describing the acceptance
    bar for extraction (requirement count, category distribution, key
    phrases).
 3. Run the same commands from "Run the full chain" or the granular verbs,
-   substituting the new paths and ids — including `validate <lcdId>` if you
-   want the conformance verdict.
+   substituting the new paths and ids — including `validate <policyId>` if
+   you want the conformance verdict.
 
 No file under `src/` or `cli.ts` changes.
+
+**A new publisher format — one dialect profile.** A dialect covers a
+publisher's *format*, not a plan or a document: one for all MAC
+LCDs/articles, one for all Cigna coverage policies. A payer whose documents
+are shaped differently needs a new profile in `src/extract/dialects/`
+(banner pattern for sniffing, section headings, code-table layout, whether
+an article is expected) — plus the fixtures above. That is the honest,
+deliberate cost of the design; CIGNA-0158 is the worked example, and
+nothing downstream of extraction changed to accommodate it.
 
 ## 9. Testing
 
@@ -252,7 +290,10 @@ npm run typecheck
 ```
 
 `npm test` includes M1's acceptance gate, which runs the live extraction
-model against the real L33822 PDF and takes roughly 40 seconds. Graph- and
+model against every `fixtures/*.expected.json` — several minutes per policy,
+so expect the full suite to take a while. Any policy whose PDF is absent is
+skipped with a message naming the path (and, for fetch-gated fixtures like
+CIGNA-0158, the script that retrieves it) rather than failing. Graph- and
 Temporal-backed tests need `docker compose up -d` and a reachable Temporal
 server, per Setup above. The validator is deliberately **not** part of
 `npm test` — its deterministic surface is tested, but no test needs Docker,
@@ -261,7 +302,10 @@ Java, or the network.
 ## 10. Repository tour
 
 - `src/extract/` — PDF → text → sections → LLM → `Requirement[]`; the only
-  Ollama-aware file is `llm-client.ts`
+  Ollama-aware file is `llm-client.ts`, and `dialects/` holds the
+  per-publisher format knowledge (MAC, Cigna) sniffed from each document
+- `src/ui/` — the review console (§6): upload, watch extraction and review
+  phases, approve/reject with a note, download artifacts
 - `src/graph/` — schema/constraints, upsert, approved-subgraph read,
   validation report
 - `src/workflow/` — Temporal review workflow, activities, worker, client
