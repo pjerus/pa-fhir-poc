@@ -1,6 +1,6 @@
 import type { Graph } from './db.ts';
 import { NODE, REL } from './schema.ts';
-import type { CodeRef, DenialReason, LcdStatus, Requirement } from '../types.ts';
+import type { CodeRef, DenialStance, LcdStatus, PolicyDenialReason, Requirement } from '../types.ts';
 
 export interface ApprovedSubgraph {
   readonly lcd: {
@@ -12,11 +12,12 @@ export interface ApprovedSubgraph {
   };
   readonly requirements: readonly Requirement[];
   readonly coveredCodes: readonly CodeRef[];
+  /** From whichever document DEFINES them — the LCD itself or its article. */
+  readonly denialReasons: readonly PolicyDenialReason[];
   readonly article?: {
     readonly id: string;
     readonly sourceHash: string;
     readonly listedCodes: readonly CodeRef[];
-    readonly denialReasons: readonly DenialReason[];
   };
 }
 
@@ -80,22 +81,35 @@ export async function readSubgraph(graph: Graph, lcdId: string): Promise<Approve
     );
     const listedCodes = listedCodeRows.map((row) => ({ system: row.system as string, code: row.code as string }));
 
-    const denialReasonRows = await graph.run(
-      `
-      MATCH (:${NODE.ARTICLE} {id: $articleId})-[:${REL.DEFINES}]->(d:${NODE.DENIAL_REASON})
-      RETURN properties(d) AS d
-      `,
-      { articleId: articleProps.id },
-    );
-    const denialReasons = denialReasonRows.map((row) => row.d as DenialReason);
-
     article = {
       id: articleProps.id,
       sourceHash: articleProps.sourceHash,
       listedCodes,
-      denialReasons,
     };
   }
+
+  const denialReasonRows = await graph.run(
+    `
+    MATCH (lcd:${NODE.LCD} {id: $lcdId})
+    OPTIONAL MATCH (lcd)-[:${REL.HAS_ARTICLE}]->(a:${NODE.ARTICLE})
+    WITH lcd, a
+    MATCH (src)-[:${REL.DEFINES}]->(d:${NODE.DENIAL_REASON})
+    WHERE src = lcd OR src = a
+    OPTIONAL MATCH (d)-[:${REL.APPLIES_TO}]->(c:${NODE.CODE})
+    RETURN properties(d) AS d, [x IN collect(c) | {system: x.system, code: x.code}] AS appliesTo
+    ORDER BY d.id
+    `,
+    { lcdId },
+  );
+  const denialReasons: PolicyDenialReason[] = denialReasonRows.map((row) => {
+    const props = row.d as { id: string; text: string; stance?: DenialStance | null };
+    return {
+      id: props.id,
+      text: props.text,
+      ...(props.stance !== undefined && props.stance !== null ? { stance: props.stance } : {}),
+      appliesTo: row.appliesTo as CodeRef[],
+    };
+  });
 
   return {
     lcd: {
@@ -107,6 +121,7 @@ export async function readSubgraph(graph: Graph, lcdId: string): Promise<Approve
     },
     requirements,
     coveredCodes,
+    denialReasons,
     ...(article !== undefined ? { article } : {}),
   };
 }

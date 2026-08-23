@@ -5,7 +5,7 @@ export type JobStatus = 'extracting' | 'starting-review' | 'attached' | 'failed'
 export interface Job {
   readonly id: string;
   readonly lcdId: string;
-  readonly articleId: string;
+  readonly articleId?: string;
   status: JobStatus;
   workflowId?: string;
   error?: string;
@@ -16,7 +16,7 @@ export class JobStore {
   private jobs: Map<string, Job> = new Map();
   private jobsByLcdId: Map<string, string> = new Map(); // lcdId -> job id
 
-  create(lcdId: string, articleId: string, now: () => string): Job {
+  create(lcdId: string, articleId: string | undefined, now: () => string): Job {
     const existingJobId = this.jobsByLcdId.get(lcdId);
     if (existingJobId) {
       const existing = this.jobs.get(existingJobId);
@@ -29,7 +29,7 @@ export class JobStore {
     const job: Job = {
       id,
       lcdId,
-      articleId,
+      ...(articleId !== undefined ? { articleId } : {}),
       status: 'extracting',
       createdAt: now(),
     };

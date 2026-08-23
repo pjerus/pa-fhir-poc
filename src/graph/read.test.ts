@@ -107,7 +107,47 @@ test('readApprovedSubgraph includes the article block when an article exists', a
   assert.equal(result.article?.id, 'TEST-R-A1');
   assert.equal(result.article?.sourceHash, 'TEST-R-hash-a1');
   assert.deepEqual(result.article?.listedCodes, [{ system: 'TEST-R-HCPCS', code: 'TEST-R-E9819' }]);
-  assert.deepEqual(result.article?.denialReasons, [{ id: 'TEST-R-A1-D1', text: 'Denial reason one' }]);
+  assert.deepEqual(result.denialReasons, [
+    { id: 'TEST-R-A1-D1', text: 'Denial reason one', appliesTo: [] },
+  ]);
+  assert.ok(!('denialReasons' in (result.article ?? {})));
+});
+
+test('denialReasons are hoisted and source-agnostic, with appliesTo collected', async () => {
+  await cleanupTestData();
+  await graph.run(`
+    CREATE (lcd:LCD {id: 'TEST-R-CIG1', status: 'draft', sourceHash: 'TEST-R-h'})
+    CREATE (d:DenialReason {id: 'TEST-R-CIG1-D1', text: 'Not medically necessary.', stance: 'not-medically-necessary'})
+    CREATE (c:Code {system: 'CPT', code: 'TEST-R-11111'})
+    CREATE (lcd)-[:DEFINES]->(d)
+    CREATE (d)-[:APPLIES_TO]->(c)
+  `);
+  const subgraph = await readSubgraph(graph, 'TEST-R-CIG1');
+  assert.equal(subgraph.article, undefined);
+  assert.deepEqual(subgraph.denialReasons, [
+    {
+      id: 'TEST-R-CIG1-D1',
+      text: 'Not medically necessary.',
+      stance: 'not-medically-necessary',
+      appliesTo: [{ system: 'CPT', code: 'TEST-R-11111' }],
+    },
+  ]);
+});
+
+test('article-sourced denial reasons appear in the same top-level list', async () => {
+  await cleanupTestData();
+  await graph.run(`
+    CREATE (lcd:LCD {id: 'TEST-R-MAC1', status: 'draft', sourceHash: 'TEST-R-h2'})
+    CREATE (a:Article {id: 'TEST-R-MAC1-A', sourceHash: 'TEST-R-h3'})
+    CREATE (d:DenialReason {id: 'TEST-R-MAC1-A-D1', text: 'Denied as not reasonable.'})
+    CREATE (lcd)-[:HAS_ARTICLE]->(a)
+    CREATE (a)-[:DEFINES]->(d)
+  `);
+  const subgraph = await readSubgraph(graph, 'TEST-R-MAC1');
+  assert.equal(subgraph.article?.id, 'TEST-R-MAC1-A');
+  assert.equal(subgraph.denialReasons.length, 1);
+  assert.deepEqual(subgraph.denialReasons[0]?.appliesTo, []);
+  assert.ok(!('denialReasons' in (subgraph.article ?? {})));
 });
 
 test('readApprovedSubgraph throws when the LCD is absent', async () => {

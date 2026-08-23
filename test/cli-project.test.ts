@@ -29,7 +29,7 @@ const NEO4J_ENV = {
 };
 
 function toLoadInput(subgraph: ApprovedSubgraph): LoadSubgraphInput {
-  const { lcd, requirements, coveredCodes, article } = subgraph;
+  const { lcd, requirements, coveredCodes, article, denialReasons } = subgraph;
   return {
     lcd: {
       id: lcd.id,
@@ -39,7 +39,16 @@ function toLoadInput(subgraph: ApprovedSubgraph): LoadSubgraphInput {
       requirements,
       coveredCodes,
     },
-    ...(article !== undefined ? { article } : {}),
+    ...(article !== undefined
+      ? {
+          article: {
+            ...article,
+            denialReasons: denialReasons.map(({ id, text, stance }) =>
+              stance !== undefined ? { id, text, stance } : { id, text },
+            ),
+          },
+        }
+      : {}),
   };
 }
 
@@ -83,6 +92,7 @@ test('project', async (t) => {
     lcd: { id: 'TEST-P-LCD2', status: 'draft', sourceHash: 'hash-lcd2' },
     requirements: [],
     coveredCodes: [],
+    denialReasons: [],
   };
   await loadSubgraph(graph, toLoadInput(draftSubgraph));
   // TEST-P-LCD2 stays draft — deliberately not approved.

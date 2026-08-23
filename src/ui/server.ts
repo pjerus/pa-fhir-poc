@@ -16,6 +16,7 @@ import { lcdIdFromPath } from '../extract/extract.ts';
 import { extractAndSnapshot, extractArticleAndSnapshot, FIXTURES_DIR, unionCodes } from '../extract/snapshot.ts';
 import { createOllamaClient } from '../extract/llm-client.ts';
 import type { LlmClient } from '../extract/llm-client.ts';
+import { sniffPdfDialect } from '../extract/dialects/index.ts';
 
 import { projectAndWrite } from '../fhir/write.ts';
 
@@ -60,6 +61,7 @@ export interface ServerDeps {
   readonly getReviewResult: typeof getReviewResult;
   readonly projectAndWrite: typeof projectAndWrite;
   readonly readSubgraph: typeof readSubgraph;
+  readonly sniffPdfDialect: typeof sniffPdfDialect;
   readonly createGraph: () => Graph;
   readonly llm: LlmClient;
   readonly jobs: JobStore;
@@ -75,10 +77,16 @@ function errorMessage(err: unknown): string {
 }
 
 /** The chain a successful upload runs through, unawaited by the route handler that fires it. */
-async function runChain(deps: ServerDeps, jobId: string, lcdPdfPath: string, articlePdfPath: string): Promise<void> {
+async function runChain(
+  deps: ServerDeps,
+  jobId: string,
+  lcdPdfPath: string,
+  articlePdfPath: string | undefined,
+): Promise<void> {
   try {
     const lcdResult = await deps.extractAndSnapshot(lcdPdfPath, deps.llm);
-    const articleResult = await deps.extractArticleAndSnapshot(articlePdfPath, deps.llm);
+    const articleResult =
+      articlePdfPath === undefined ? undefined : await deps.extractArticleAndSnapshot(articlePdfPath, deps.llm);
 
     deps.jobs.markStartingReview(jobId);
 
@@ -86,18 +94,22 @@ async function runChain(deps: ServerDeps, jobId: string, lcdPdfPath: string, art
       id: lcdResult.lcdId,
       sourceHash: lcdResult.sourceHash,
       requirements: lcdResult.requirements,
-      coveredCodes: unionCodes(lcdResult.hcpcsCodes, articleResult.hcpcsCodes),
+      coveredCodes: unionCodes(lcdResult.hcpcsCodes, articleResult?.hcpcsCodes ?? []),
+      ...(lcdResult.denialReasons !== undefined ? { denialReasons: lcdResult.denialReasons } : {}),
     };
-    const article: ArticleInput = {
-      id: articleResult.id,
-      sourceHash: articleResult.sourceHash,
-      listedCodes: articleResult.listedCodes,
-      denialReasons: articleResult.denialReasons,
-    };
+    const article: ArticleInput | undefined =
+      articleResult === undefined
+        ? undefined
+        : {
+            id: articleResult.id,
+            sourceHash: articleResult.sourceHash,
+            listedCodes: articleResult.listedCodes,
+            denialReasons: articleResult.denialReasons,
+          };
 
     let workflowId: string;
     try {
-      workflowId = await deps.startReview({ lcd, article });
+      workflowId = await deps.startReview(article === undefined ? { lcd } : { lcd, article });
     } catch (err) {
       // Idempotent startReview: an already-running workflow for this lcdId is
       // success, not failure — Temporal's own dedup primitive, not reimplemented.
@@ -164,25 +176,38 @@ export function createHandlers(deps: ServerDeps): {
 
   async function postRuns(formData: FormData): Promise<HandlerResult> {
     const lcdFile = formData.get('lcdPdf');
-    const articleFile = formData.get('articlePdf');
-    if (!(lcdFile instanceof File) || !(articleFile instanceof File)) {
-      return { status: 400, body: { error: 'multipart form must include lcdPdf and articlePdf files' } };
+    if (!(lcdFile instanceof File) || lcdFile.size === 0) {
+      return { status: 400, body: { error: 'multipart form must include an lcdPdf file' } };
     }
+    const articleFile = formData.get('articlePdf');
+    const hasArticle = articleFile instanceof File && articleFile.size > 0;
 
     const lcdId = lcdIdFromPath(lcdFile.name);
-    const articleId = lcdIdFromPath(articleFile.name);
-    if (!SAFE_ID.test(lcdId) || !SAFE_ID.test(articleId)) {
+    const articleId = hasArticle ? lcdIdFromPath(articleFile.name) : undefined;
+    if (!SAFE_ID.test(lcdId) || (articleId !== undefined && !SAFE_ID.test(articleId))) {
       return {
         status: 400,
         body: { error: `filenames must derive a safe id; got lcd="${lcdId}" article="${articleId}"` },
       };
     }
 
+    await mkdir(FIXTURES_DIR, { recursive: true });
+    const lcdPath = join(FIXTURES_DIR, `${lcdId}.pdf`);
+    await writeFile(lcdPath, Buffer.from(await lcdFile.arrayBuffer()));
+
+    const dialect = await deps.sniffPdfDialect(lcdPath);
+    if (dialect.articleExpectation === 'required' && !hasArticle) {
+      return { status: 400, body: { error: `dialect "${dialect.name}" pairs the policy with an article PDF — upload both files` } };
+    }
+    if (dialect.articleExpectation === 'none' && hasArticle) {
+      return { status: 400, body: { error: `dialect "${dialect.name}" is a single-document policy — do not upload an article PDF` } };
+    }
+
     // Idempotent submit: a non-terminal job for this lcdId already means a
     // chain is in flight — attach the caller to it instead of starting a
     // second one. JobStore.create() itself already returns that existing
-    // job; the pre-check here is only to skip re-writing files / re-firing
-    // the chain for it.
+    // job; the pre-check here is only to skip re-writing the article file /
+    // re-firing the chain for it.
     const alreadyInFlight = deps.jobs
       .list()
       .some((job) => job.lcdId === lcdId && (job.status === 'extracting' || job.status === 'starting-review'));
@@ -191,11 +216,11 @@ export function createHandlers(deps: ServerDeps): {
       return { status: 202, body: { jobId: job.id } };
     }
 
-    await mkdir(FIXTURES_DIR, { recursive: true });
-    const lcdPath = join(FIXTURES_DIR, `${lcdId}.pdf`);
-    const articlePath = join(FIXTURES_DIR, `${articleId}.pdf`);
-    await writeFile(lcdPath, Buffer.from(await lcdFile.arrayBuffer()));
-    await writeFile(articlePath, Buffer.from(await articleFile.arrayBuffer()));
+    let articlePath: string | undefined;
+    if (hasArticle && articleFile instanceof File) {
+      articlePath = join(FIXTURES_DIR, `${articleId}.pdf`);
+      await writeFile(articlePath, Buffer.from(await articleFile.arrayBuffer()));
+    }
 
     void runChain(deps, job.id, lcdPath, articlePath);
 
@@ -310,6 +335,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     getReviewResult,
     projectAndWrite,
     readSubgraph,
+    sniffPdfDialect,
     createGraph: () => createGraph(loadGraphConfig()),
     llm: ollamaClient(),
     jobs: new JobStore(),

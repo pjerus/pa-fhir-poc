@@ -15,6 +15,8 @@ import type { ArticleExtractionResult } from '../extract/article.ts';
 import type { ApprovedSubgraph } from '../graph/read.ts';
 import type { Graph } from '../graph/db.ts';
 import type { ReviewWorkflowInfo } from '../workflow/client.ts';
+import type { Dialect } from '../extract/dialects/index.ts';
+import type { SectionVocabulary } from '../extract/sections.ts';
 
 // Route handlers only — every dep is a fake; no live Ollama/Temporal/Neo4j.
 // `postRuns` fires its extraction chain unawaited (matches the real server's
@@ -62,6 +64,20 @@ function articleResult(articleId: string): ArticleExtractionResult {
   };
 }
 
+const EMPTY_VOCABULARY: SectionVocabulary = { headings: [], boundaries: [], terminal: /$/ };
+
+function fakeDialect(articleExpectation: Dialect['articleExpectation']): Dialect {
+  return {
+    name: 'mac',
+    documentName: 'Medicare coverage policy',
+    articleExpectation,
+    vocabulary: EMPTY_VOCABULARY,
+    sniff: () => true,
+    verifyId: () => {},
+    extractCoding: () => ({ coveredCodes: [], denialReasons: [], warnings: [] }),
+  };
+}
+
 function fakeGraph(): Graph & { closed: boolean } {
   const graph = {
     closed: false,
@@ -103,6 +119,7 @@ function baseDeps(overrides: Partial<ServerDeps> = {}): ServerDeps {
     readSubgraph: async () => {
       throw new Error('readSubgraph not stubbed');
     },
+    sniffPdfDialect: async () => fakeDialect('required'),
     createGraph: () => fakeGraph(),
     llm: { complete: async () => '' },
     jobs: new JobStore(),
@@ -131,8 +148,9 @@ after(async () => {
   }
 });
 
-function trackUpload(lcdId: string, articleId: string): void {
-  writtenFixturePaths.push(join(FIXTURES_DIR, `${lcdId}.pdf`), join(FIXTURES_DIR, `${articleId}.pdf`));
+function trackUpload(lcdId: string, articleId?: string): void {
+  writtenFixturePaths.push(join(FIXTURES_DIR, `${lcdId}.pdf`));
+  if (articleId !== undefined) writtenFixturePaths.push(join(FIXTURES_DIR, `${articleId}.pdf`));
 }
 
 test('postRuns: happy path writes both PDFs, runs the chain in order, and attaches', async () => {
@@ -175,10 +193,40 @@ test('postRuns: an unsafe id derived from a filename → 400', async () => {
   assert.equal(result.status, 400);
 });
 
-test('postRuns: missing articlePdf part → 400', async () => {
-  const handlers = createHandlers(baseDeps());
-  const result = await handlers.postRuns(uploadForm('TEST-U-ONLY.pdf'));
+test('upload without an article is accepted when the sniffed dialect needs none', async () => {
+  const jobs = new JobStore();
+  const deps = baseDeps({
+    jobs,
+    sniffPdfDialect: async () => fakeDialect('none'),
+    extractAndSnapshot: async () => extractionResult('TEST-U-NOART'),
+    startReview: async (input) => `review-${input.lcd.id}`,
+  });
+  const handlers = createHandlers(deps);
+
+  const result = await handlers.postRuns(uploadForm('TEST-U-NOART.pdf'));
+  trackUpload('TEST-U-NOART');
+
+  assert.equal(result.status, 202);
+  const jobId = (result.body as { jobId: string }).jobId;
+  assert.equal(jobs.get(jobId)?.articleId, undefined);
+
+  await waitUntil(() => jobs.get(jobId)?.status === 'attached');
+});
+
+test('upload without an article is rejected 400 when the dialect requires one', async () => {
+  const handlers = createHandlers(baseDeps({ sniffPdfDialect: async () => fakeDialect('required') }));
+  const result = await handlers.postRuns(uploadForm('TEST-U-REQ.pdf'));
+  trackUpload('TEST-U-REQ');
   assert.equal(result.status, 400);
+  assert.match((result.body as { error: string }).error, /article/i);
+});
+
+test('upload WITH an article is rejected 400 when the dialect forbids one', async () => {
+  const handlers = createHandlers(baseDeps({ sniffPdfDialect: async () => fakeDialect('none') }));
+  const result = await handlers.postRuns(uploadForm('TEST-U-FORBID.pdf', 'TEST-U-FORBID-A.pdf'));
+  trackUpload('TEST-U-FORBID');
+  assert.equal(result.status, 400);
+  assert.match((result.body as { error: string }).error, /article/i);
 });
 
 test('postRuns: a duplicate submit for an in-flight lcdId returns the existing jobId without re-firing the chain', async () => {
@@ -354,6 +402,7 @@ test('getReview: success returns the subgraph and closes the graph', async () =>
     lcd: { id: 'TEST-U-R2', status: 'draft', sourceHash: 'h' },
     requirements: [],
     coveredCodes: [],
+    denialReasons: [],
   };
   const deps = baseDeps({ createGraph: () => graph, readSubgraph: async () => subgraph });
   const handlers = createHandlers(deps);

@@ -20,11 +20,11 @@ export function syntheticSubgraph(overrides: Partial<ApprovedSubgraph> = {}): Ap
       { system: 'HCPCS', code: 'TEST-P-E9819' },
       { system: 'HCPCS', code: 'TEST-P-K9813' },
     ],
+    denialReasons: [{ id: 'TEST-P-ART1-D1', text: 'Not medically necessary.', appliesTo: [] }],
     article: {
       id: 'TEST-P-ART1',
       sourceHash: 'hash-art',
       listedCodes: [{ system: 'ICD-10-CM', code: 'TEST-P-E99.1' }],
-      denialReasons: [{ id: 'TEST-P-ART1-D1', text: 'Not medically necessary.' }],
     },
     ...overrides,
   };
