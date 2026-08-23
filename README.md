@@ -116,6 +116,13 @@ projecting a draft throws.
   they cannot be fetched programmatically and are not redistributed in this
   repository. Every stage that needs them fails loudly with the exact path
   it expected if they are absent.
+- **Third fixture (CIGNA-0158, single-document dialect):** unlike the
+  public-domain CMS documents above, Cigna's coverage policy is copyrighted,
+  so `fixtures/CIGNA-0158.pdf` is deliberately not committed. Fetch it with
+  `./tools/fetch-cigna-0158.sh`, then run it through the same pipeline with
+  no article argument: `node cli.ts run fixtures/CIGNA-0158.pdf`. If the PDF
+  is absent, `npm test`'s acceptance gate skips that LCD's ground-truth test
+  with an explanatory message rather than failing.
 
 ## 5. Setup
 
@@ -152,6 +159,10 @@ node src/workflow/worker.ts
 ```bash
 node cli.ts run fixtures/L33822.pdf fixtures/A52464.pdf
 ```
+
+(General form: `node cli.ts run <policy.pdf> [article.pdf]` — the article is
+required for MAC LCDs and rejected for single-document Cigna policies, per
+the sniffed dialect.)
 
 This extracts both PDFs, starts the review workflow (whose first activity
 loads the graph), prints the workflow id, and then blocks. That block is the

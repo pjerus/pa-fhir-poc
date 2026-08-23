@@ -22,6 +22,8 @@ export const CQF_LIBRARY_EXTENSION = 'http://hl7.org/fhir/StructureDefinition/cq
 const CODE_SYSTEM_URIS: Readonly<Record<string, string>> = {
   HCPCS: 'http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets',
   'ICD-10-CM': 'http://hl7.org/fhir/sid/icd-10-cm',
+  /** THO external code systems — CPT's canonical, verified against terminology.hl7.org. */
+  CPT: 'http://www.ama-assn.org/go/cpt',
 };
 
 export function codeSystemUri(system: string): string {

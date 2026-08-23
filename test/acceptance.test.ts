@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readdir, readFile } from 'node:fs/promises';
+import { access, readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { extractLcd } from '../src/extract/extract.ts';
@@ -28,9 +28,18 @@ if (lcdIds.length === 0) {
 }
 
 for (const lcdId of lcdIds) {
+  const pdfPath = join(FIXTURES_DIR, `${lcdId}.pdf`);
+  const hasPdf = await access(pdfPath).then(() => true, () => false);
+
   test(
     `extraction of ${lcdId} matches its ground truth`,
-    { timeout: EXTRACTION_TIMEOUT_MS },
+    {
+      timeout: EXTRACTION_TIMEOUT_MS,
+      skip: hasPdf
+        ? false
+        : `${pdfPath} missing. Committed fixtures should always be present; fetch-gated fixtures ` +
+          '(copyrighted sources, e.g. CIGNA-0158) are downloaded by their tools/fetch-*.sh script.',
+    },
     async () => {
       const expectedPath = join(FIXTURES_DIR, `${lcdId}${EXPECTED_SUFFIX}`);
       const expected = parseExpected(

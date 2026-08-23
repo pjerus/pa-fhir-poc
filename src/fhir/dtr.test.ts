@@ -18,6 +18,10 @@ test('codeSystemUri returns the verified ICD-10-CM canonical', () => {
   assert.equal(codeSystemUri('ICD-10-CM'), 'http://hl7.org/fhir/sid/icd-10-cm');
 });
 
+test('CPT maps to the AMA canonical', () => {
+  assert.equal(codeSystemUri('CPT'), 'http://www.ama-assn.org/go/cpt');
+});
+
 test('codeSystemUri throws naming the unknown system and the known systems', () => {
   assert.throws(
     () => codeSystemUri('SNOMED'),
