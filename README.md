@@ -35,8 +35,12 @@ reviewer's approval, recorded on the graph.
 
 ## 1. See the output without running anything
 
-The three artifacts projected from each reviewed graph are committed as
-[`docs/examples/`](docs/examples/), for both demonstration LCDs:
+The artifacts projected from each reviewed graph are committed as
+[`docs/examples/`](docs/examples/), for both demonstration LCDs (a policy
+that states no documentation requirements — e.g. the CIGNA-0158 third
+fixture — projects no DTR Questionnaire, because `dtr-std-questionnaire`
+requires at least one item; see
+[`docs/conformance/CIGNA-0158.md`](docs/conformance/CIGNA-0158.md)):
 
 - [`L33822.dtr.json`](docs/examples/L33822.dtr.json) /
   [`L33718.dtr.json`](docs/examples/L33718.dtr.json) — DTR Questionnaire, one

@@ -1,0 +1,446 @@
+{
+  "lcdId": "CIGNA-0158",
+  "dialect": "cigna",
+  "sourceHash": "d4eab1e9d0bdf3f85a97665cb8ba087e38347a5a54ce511303abfee48b0d0434",
+  "requirements": [
+    {
+      "id": "CIGNA-0158-R1",
+      "text": "Drug-induced sleep endoscopy (DISE) is considered medically necessary for the evaluation of upper airway surgery in an adult when persistent OSA is present when criteria for positive airway pressure (PAP) met and documentation that demonstrates PAP treatment failure, defined as an inability to eliminate OSA (apnea-hypopnea index [AHI] > 15); OR PAP intolerance, defined as inability to use PAP > 4 hours of use per night, 5 nights per week; OR unwillingness to use PAP (e.g., a patient returns the PAP system after attempting to use it)",
+      "ordinal": 1,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R2",
+      "text": "Drug-induced sleep endoscopy (DISE) is considered medically necessary for the evaluation of upper airway surgery in an adult when persistent OSA is present after surgical intervention to treat OSA",
+      "ordinal": 2,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R3",
+      "text": "Drug-induced sleep endoscopy (DISE) is considered medically necessary in an adolescent aged 13-18 with Down syndrome to evaluate the appropriateness of a U.S. Food and Drug Administration (FDA)-approved implantable upper airway hypoglossal nerve stimulation device",
+      "ordinal": 3,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R4",
+      "text": "Drug-induced sleep endoscopy (DISE) is considered medically necessary in a child for evaluation of persistent OSA after surgical intervention to treat OSA",
+      "ordinal": 4,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R5",
+      "text": "Drug-induced sleep endoscopy (DISE) is considered medically necessary in a child for evaluation of suspected OSA, as evidenced by observed restlessness with sleep, apneic periods, sleep disturbance, snoring, sleepiness upon awakening or during daytime, when performed in conjunction with other surgery (e.g., tonsillectomy, adenoidectomy, nasal or sinus surgery)",
+      "ordinal": 5,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R6",
+      "text": "Uvulopalatopharyngoplasty (UPPP) is considered medically necessary for the treatment of OSA when demonstrated narrowing or collapse of the retropalatal region (soft palate, uvula, tonsils, posterior pharyngeal wall) as a source of airway obstruction is present",
+      "ordinal": 6,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R7",
+      "text": "Uvulopalatopharyngoplasty (UPPP) is considered medically necessary for the treatment of OSA when criteria for PAP met and documentation that demonstrates PAP treatment failure defined as an inability to eliminate OSA (AHI > 15); OR PAP intolerance defined as inability to use PAP > 4 hours of use per night, 5 nights per week; OR unwillingness to use PAP (e.g., a patient returns the PAP system after attempting to use it)",
+      "ordinal": 7,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R8",
+      "text": "Uvulopalatopharyngoplasty (UPPP) is considered medically necessary for the treatment of OSA in an adult when consideration has also been given to use of mandibular repositioning appliance (MRA) or tongue-retaining appliance",
+      "ordinal": 8,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R9",
+      "text": "Uvulectomy as a stand-alone procedure for the treatment of OSA is considered not medically necessary",
+      "ordinal": 9,
+      "category": "limitation"
+    },
+    {
+      "id": "CIGNA-0158-R10",
+      "text": "Multi-level or stepwise surgery (MLS) (e.g., UPPP and/or genioglossus advancement and hyoid myotomy [GAHM], maxillary and mandibular advancement osteotomy [MMO]) as a combined procedure or as stepwise multiple procedures is considered medically necessary for the treatment of OSA when narrowing of multiple sites in the upper airway is present",
+      "ordinal": 10,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R11",
+      "text": "Multi-level or stepwise surgery (MLS) (e.g., UPPP and/or genioglossus advancement and hyoid myotomy [GAHM], maxillary and mandibular advancement osteotomy [MMO]) as a combined procedure or as stepwise multiple procedures is considered medically necessary for the treatment of OSA when criteria for PAP met and documentation that demonstrates PAP treatment failure defined as an inability to eliminate OSA (AHI > 15); OR PAP intolerance defined as inability to use PAP > 4 hours of use per night, 5 nights per week; OR unwillingness to use PAP (e.g., a patient returns the PAP system after attempting to use it)",
+      "ordinal": 11,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R12",
+      "text": "Multi-level or stepwise surgery (MLS) (e.g., UPPP and/or genioglossus advancement and hyoid myotomy [GAHM], maxillary and mandibular advancement osteotomy [MMO]) as a combined procedure or as stepwise multiple procedures is considered medically necessary for the treatment of OSA in an adult when an MRA or tongue-retaining appliance has been considered and found to be ineffective or undesirable",
+      "ordinal": 12,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R13",
+      "text": "Maxillomandibular advancement is considered medically necessary for the treatment of severe OSA when criteria for PAP met and documentation that demonstrates PAP treatment failure defined as an inability to eliminate OSA (AHI > 15); OR PAP intolerance defined as inability to use PAP > 4 hours of use per night, 5 nights per week; OR unwillingness to use PAP (e.g., a patient returns the PAP system after attempting to use it)",
+      "ordinal": 13,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R14",
+      "text": "Maxillomandibular advancement is considered medically necessary for the treatment of severe OSA in an adult when an MRA or tongue-retaining appliance has been considered and found to be ineffective or undesirable",
+      "ordinal": 14,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R15",
+      "text": "Maxillomandibular advancement is considered medically necessary for the treatment of severe OSA when the individual has craniofacial disproportion or deformities",
+      "ordinal": 15,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R16",
+      "text": "A U.S. Food and Drug Administration (FDA)-approved implantable upper airway hypoglossal nerve stimulation device is considered medically necessary for the treatment of moderate to severe OSA in an adult when age, AHI on polysomnography (PSG), and body mass index (BMI) meet device-specific criteria (Inspire: ≥ 18 years, AHI ≥ 15 and ≤100 events per hour, BMI ≤ 40; Genio® System 2.1: ≥ 22 years, AHI ≥ 15 and ≤65 events per hour, BMI ≤ 32)",
+      "ordinal": 16,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R17",
+      "text": "A U.S. Food and Drug Administration (FDA)-approved implantable upper airway hypoglossal nerve stimulation device is considered medically necessary for the treatment of moderate to severe OSA in an adult when central + mixed apneas are ≤ 25% of total AHI",
+      "ordinal": 17,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R18",
+      "text": "A U.S. Food and Drug Administration (FDA)-approved implantable upper airway hypoglossal nerve stimulation device is considered medically necessary for the treatment of moderate to severe OSA in an adult when there is absence of a complete concentric collapse at the soft palate level on drug induced sleep endoscopy",
+      "ordinal": 18,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R19",
+      "text": "A U.S. Food and Drug Administration (FDA)-approved implantable upper airway hypoglossal nerve stimulation device is considered medically necessary for the treatment of moderate to severe OSA in an adult when documentation demonstrates EITHER PAP treatment failure defined as an inability to eliminate OSA (AHI ≥ 15); OR PAP intolerance defined as inability to use PAP > 4 hours of use per night, 5 nights per week; OR unwillingness to use PAP (e.g., a patient returns the PAP system after attempting to use it)",
+      "ordinal": 19,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R20",
+      "text": "An FDA-approved implantable upper airway hypoglossal nerve stimulation device is considered medically necessary for the treatment OSA in a pediatric individual with Down syndrome when age, AHI on PSG, and BMI meet device-specific criteria (Inspire: 13-18 years, AHI > 10 and < 50 events per hour, BMI ≤ 95th percentile for age)",
+      "ordinal": 20,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R21",
+      "text": "An FDA-approved implantable upper airway hypoglossal nerve stimulation device is considered medically necessary for the treatment OSA in a pediatric individual with Down syndrome when there is absence of complete concentric collapse at the soft palate level",
+      "ordinal": 21,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R22",
+      "text": "An FDA-approved implantable upper airway hypoglossal nerve stimulation device is considered medically necessary for the treatment OSA in a pediatric individual with Down syndrome when the condition is contraindicated for, or not effectively treated by adenotonsillectomy",
+      "ordinal": 22,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R23",
+      "text": "An FDA-approved implantable upper airway hypoglossal nerve stimulation device is considered medically necessary for the treatment OSA in a pediatric individual with Down syndrome when the patient is confirmed to have failed, or cannot tolerate, PAP therapy despite attempts to improve compliance",
+      "ordinal": 23,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R24",
+      "text": "An FDA-approved implantable upper airway hypoglossal nerve stimulation device is considered medically necessary for the treatment OSA in a pediatric individual with Down syndrome when all other alternative/adjunct therapies have been considered",
+      "ordinal": 24,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R25",
+      "text": "The replacement of a remote that is used with an FDA-approved implantable upper airway hypoglossal nerve stimulation device is considered medically necessary when there is documentation confirming that the remote is malfunctioning and is no longer under warranty",
+      "ordinal": 25,
+      "category": "indication"
+    },
+    {
+      "id": "CIGNA-0158-R26",
+      "text": "Off-the-shelf batteries, used in the remote for the hypoglossal nerve stimulation device, are generally considered not medically necessary because they are not primarily medical in nature",
+      "ordinal": 26,
+      "category": "limitation"
+    },
+    {
+      "id": "CIGNA-0158-R27",
+      "text": "Atrial overdrive pacing for the treatment of OSA is considered experimental, investigational or unproven",
+      "ordinal": 27,
+      "category": "limitation"
+    },
+    {
+      "id": "CIGNA-0158-R28",
+      "text": "Cautery-assisted palatal stiffening operation (CAPSO) for the treatment of OSA is considered experimental, investigational or unproven",
+      "ordinal": 28,
+      "category": "limitation"
+    },
+    {
+      "id": "CIGNA-0158-R29",
+      "text": "Injection snoreplasty for the treatment of OSA is considered experimental, investigational or unproven",
+      "ordinal": 29,
+      "category": "limitation"
+    },
+    {
+      "id": "CIGNA-0158-R30",
+      "text": "Pillar™ Palatal Implant System for the treatment of OSA is considered experimental, investigational or unproven",
+      "ordinal": 30,
+      "category": "limitation"
+    },
+    {
+      "id": "CIGNA-0158-R31",
+      "text": "Radiofrequency volumetric tissue reduction (RFVTR) of the soft palate, uvula, or tongue base (e.g., Coblation®, Somnoplasty®) for the treatment of OSA is considered experimental, investigational or unproven",
+      "ordinal": 31,
+      "category": "limitation"
+    },
+    {
+      "id": "CIGNA-0158-R32",
+      "text": "Tongue-base suspension (e.g., AIRvance™ System, ENCORE™ Tongue Suspension System) for the treatment of OSA is considered experimental, investigational or unproven",
+      "ordinal": 32,
+      "category": "limitation"
+    },
+    {
+      "id": "CIGNA-0158-R33",
+      "text": "Transpalatal advancement pharyngoplasty (TPAP) for the treatment of OSA is considered experimental, investigational or unproven",
+      "ordinal": 33,
+      "category": "limitation"
+    },
+    {
+      "id": "CIGNA-0158-R34",
+      "text": "The treatment of snoring alone by any method is considered not medically necessary",
+      "ordinal": 34,
+      "category": "limitation"
+    }
+  ],
+  "hcpcsCodes": [
+    {
+      "system": "CPT",
+      "code": "21193"
+    },
+    {
+      "system": "CPT",
+      "code": "21194"
+    },
+    {
+      "system": "CPT",
+      "code": "21195"
+    },
+    {
+      "system": "CPT",
+      "code": "21196"
+    },
+    {
+      "system": "CPT",
+      "code": "21198"
+    },
+    {
+      "system": "CPT",
+      "code": "21199"
+    },
+    {
+      "system": "CPT",
+      "code": "21206"
+    },
+    {
+      "system": "CPT",
+      "code": "21685"
+    },
+    {
+      "system": "CPT",
+      "code": "42145"
+    },
+    {
+      "system": "CPT",
+      "code": "42975"
+    },
+    {
+      "system": "CPT",
+      "code": "61886"
+    },
+    {
+      "system": "CPT",
+      "code": "64568"
+    },
+    {
+      "system": "CPT",
+      "code": "64582"
+    },
+    {
+      "system": "HCPCS",
+      "code": "C1767"
+    },
+    {
+      "system": "HCPCS",
+      "code": "C1778"
+    },
+    {
+      "system": "HCPCS",
+      "code": "C1787"
+    },
+    {
+      "system": "HCPCS",
+      "code": "C8007"
+    },
+    {
+      "system": "HCPCS",
+      "code": "C8011"
+    },
+    {
+      "system": "HCPCS",
+      "code": "L8680"
+    },
+    {
+      "system": "HCPCS",
+      "code": "L8681"
+    },
+    {
+      "system": "HCPCS",
+      "code": "L8686"
+    },
+    {
+      "system": "HCPCS",
+      "code": "L8688"
+    }
+  ],
+  "denialReasons": [
+    {
+      "id": "CIGNA-0158-D1",
+      "text": "Considered Not Medically Necessary for the treatment of snoring in the absence of sleep apnea:",
+      "stance": "not-medically-necessary",
+      "appliesTo": [
+        {
+          "system": "CPT",
+          "code": "21193"
+        },
+        {
+          "system": "CPT",
+          "code": "21194"
+        },
+        {
+          "system": "CPT",
+          "code": "21195"
+        },
+        {
+          "system": "CPT",
+          "code": "21196"
+        },
+        {
+          "system": "CPT",
+          "code": "21198"
+        },
+        {
+          "system": "CPT",
+          "code": "21199"
+        },
+        {
+          "system": "CPT",
+          "code": "21206"
+        },
+        {
+          "system": "CPT",
+          "code": "21685"
+        },
+        {
+          "system": "CPT",
+          "code": "42145"
+        },
+        {
+          "system": "CPT",
+          "code": "42975"
+        },
+        {
+          "system": "CPT",
+          "code": "61886"
+        },
+        {
+          "system": "CPT",
+          "code": "64568"
+        },
+        {
+          "system": "CPT",
+          "code": "64582"
+        },
+        {
+          "system": "HCPCS",
+          "code": "C1767"
+        },
+        {
+          "system": "HCPCS",
+          "code": "C1778"
+        },
+        {
+          "system": "HCPCS",
+          "code": "C1787"
+        },
+        {
+          "system": "HCPCS",
+          "code": "C8007"
+        },
+        {
+          "system": "HCPCS",
+          "code": "C8011"
+        },
+        {
+          "system": "HCPCS",
+          "code": "L8680"
+        },
+        {
+          "system": "HCPCS",
+          "code": "L8681"
+        },
+        {
+          "system": "HCPCS",
+          "code": "L8686"
+        },
+        {
+          "system": "HCPCS",
+          "code": "L8688"
+        }
+      ]
+    },
+    {
+      "id": "CIGNA-0158-D2",
+      "text": "Considered Not Medically Necessary when used to report uvulectomy as a stand-alone procedure for the treatment of obstructive sleep apnea:",
+      "stance": "not-medically-necessary",
+      "appliesTo": [
+        {
+          "system": "CPT",
+          "code": "42140"
+        }
+      ]
+    },
+    {
+      "id": "CIGNA-0158-D3",
+      "text": "Considered Experimental/Investigational/Unproven for the treatment of sleep apnea:",
+      "stance": "experimental-investigational",
+      "appliesTo": [
+        {
+          "system": "CPT",
+          "code": "41512"
+        },
+        {
+          "system": "CPT",
+          "code": "41530"
+        },
+        {
+          "system": "CPT",
+          "code": "42160"
+        },
+        {
+          "system": "HCPCS",
+          "code": "C9727"
+        }
+      ]
+    },
+    {
+      "id": "CIGNA-0158-D4",
+      "text": "Considered Experimental/Investigational/Unproven when used to report cautery- assisted palatal stiffening operation (CAPSO), injection Snoreplasty, or transpalatal advancement pharyngoplasty:",
+      "stance": "experimental-investigational",
+      "appliesTo": [
+        {
+          "system": "CPT",
+          "code": "42299"
+        }
+      ]
+    }
+  ],
+  "warnings": [
+    "No \"documentation\" heading found; downstream extraction will skip that section."
+  ]
+}

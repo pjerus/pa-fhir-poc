@@ -31,9 +31,13 @@ repo is its natural first real consumer:
   independently found and root-caused by the same author's IG-examples
   validation sweep the day before; this just adds a second, independent
   confirmation from a different IG.
-- **Blocked on:** the two issues above landing upstream. Once fixed, redo
-  this generation and re-run `safeParse()` against the real projected
-  artifacts before wiring the guardrail into `projectLcd()`.
+- **Blocked on:** ~~the two issues above landing upstream.~~ **Unblocked
+  2026-08-22** — both closed upstream. Redo the generation and re-run
+  `safeParse()` against the real projected artifacts before wiring the
+  guardrail into `projectLcd()`. Note the guardrail now covers three
+  fixtures, and a zero-documentation policy (CIGNA-0158) projects *no*
+  Questionnaire at all — the guardrail wires in at `projectLcd()` for
+  whichever artifacts exist.
 
 ## DTR Questionnaire sourcing beyond the documentation category
 
@@ -47,6 +51,13 @@ CRD card. A richer DTR Questionnaire would draw items from indication
 criteria too. That is a deliberate M4 design change (the plan says
 "documentation-category requirements"), so it is recorded here rather than
 made silently.
+
+**Sharpened by the third fixture (2026-08-22):** CIGNA-0158 has *zero*
+documentation-category requirements, so it projects no Questionnaire at all
+(`dtr-std-questionnaire` requires `item` 1..* — see
+`docs/conformance/CIGNA-0158.md`). Indication-sourced items are the only way
+a commercial policy of this shape gets a DTR artifact; design decision D4 in
+the dialect-seam spec deliberately deferred this to its own task.
 
 ## Carried over from the POC plan (out of scope by design)
 
