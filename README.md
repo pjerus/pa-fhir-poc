@@ -51,6 +51,11 @@ requires at least one item; see
 - [`L33822.plandefinition.json`](docs/examples/L33822.plandefinition.json) /
   [`L33718.plandefinition.json`](docs/examples/L33718.plandefinition.json) —
   PlanDefinition linking each covered code to the questionnaire.
+- [`CIGNA-0158.crd.json`](docs/examples/CIGNA-0158.crd.json) /
+  [`CIGNA-0158.plandefinition.json`](docs/examples/CIGNA-0158.plandefinition.json)
+  — the commercial-payer third fixture (single-document Cigna dialect):
+  CPT + HCPCS covered codes; no Questionnaire, because the policy states no
+  documentation requirements.
 
 ## 2. What's proven vs. deliberately deferred
 

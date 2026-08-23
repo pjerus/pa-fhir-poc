@@ -1,0 +1,324 @@
+{
+  "resourceType": "PlanDefinition",
+  "id": "CIGNA-0158",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Prior-authorization plan generated from Medicare LCD CIGNA-0158: 22 covered codes, each requiring the documentation questionnaire.</p></div>"
+  },
+  "url": "http://example.org/pa-fhir-poc/PlanDefinition/CIGNA-0158",
+  "name": "CIGNA-0158",
+  "status": "active",
+  "library": [
+    "http://example.org/pa-fhir-poc/Library/CIGNA-0158-cql-stub"
+  ],
+  "action": [
+    {
+      "title": "Documentation required for CPT 42975",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "42975"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 21685",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "21685"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 21194",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "21194"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for HCPCS C1767",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "C1767"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 42145",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "42145"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 21198",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "21198"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for HCPCS L8681",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "L8681"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for HCPCS C8007",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "C8007"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for HCPCS C1778",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "C1778"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 21195",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "21195"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 21199",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "21199"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for HCPCS C1787",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "C1787"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 64568",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "64568"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for HCPCS C8011",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "C8011"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for HCPCS L8688",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "L8688"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 21196",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "21196"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for HCPCS L8680",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "L8680"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 21206",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "21206"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 61886",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "61886"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for HCPCS L8686",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+              "code": "L8686"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 21193",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "21193"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    },
+    {
+      "title": "Documentation required for CPT 64582",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "64582"
+            }
+          ]
+        }
+      ],
+      "definitionCanonical": "http://example.org/pa-fhir-poc/Questionnaire/CIGNA-0158"
+    }
+  ]
+}
