@@ -57,6 +57,18 @@ test('buildCrdResponse detail omits the limitation heading when there are only i
   assert.doesNotMatch(card.detail, /### documentation/);
 });
 
+test('buildCrdResponse with no documentation requirements: no questionnaire link, no documentation claim', () => {
+  const [card] = buildCrdResponse(
+    syntheticSubgraph({
+      requirements: [{ id: 'TEST-P-LCD1-R1', text: 'Indication only.', ordinal: 1, category: 'indication' }],
+    }),
+  ).cards;
+  assert.ok(card);
+  assert.equal(card.links.length, 0);
+  assert.match(card.summary, /coverage criteria apply/);
+  assert.doesNotMatch(card.summary, /documentation requirements apply/);
+});
+
 test('buildCrdResponse emits one link to the Questionnaire canonical', () => {
   const [card] = buildCrdResponse(syntheticSubgraph()).cards;
   assert.ok(card);

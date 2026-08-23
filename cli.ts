@@ -127,7 +127,21 @@ async function runProject(args: readonly string[]): Promise<void> {
   if (lcdId === undefined) throw new Error(`project needs an LCD id.\n\n${USAGE}`);
 
   const { paths } = await projectAndWrite(lcdId);
-  process.stdout.write(`${paths.crd}\n${paths.dtr}\n${paths.planDefinition}\n`);
+  writeProjectedPaths(paths, lcdId);
+}
+
+function writeProjectedPaths(
+  paths: { readonly crd: string; readonly dtr?: string; readonly planDefinition: string },
+  lcdId: string,
+): void {
+  const lines = [paths.crd, ...(paths.dtr !== undefined ? [paths.dtr] : []), paths.planDefinition];
+  process.stdout.write(`${lines.join('\n')}\n`);
+  if (paths.dtr === undefined) {
+    process.stderr.write(
+      `No DTR Questionnaire emitted: ${lcdId} states no documentation requirements ` +
+        '(dtr-std-questionnaire requires at least one item).\n',
+    );
+  }
 }
 
 async function assertFileExists(path: string, label: string): Promise<void> {
@@ -151,6 +165,11 @@ async function runValidate(args: readonly string[]): Promise<void> {
   process.stdout.write(
     `SKIP  ${lcdId}.crd.json — CRD card is a CDS Hooks logical model under CRD v2.2.1, not a FHIR resource instance; no StructureDefinition applies.\n`,
   );
+  if (!results.some(({ run }) => run.artifactFile.endsWith('.dtr.json'))) {
+    process.stdout.write(
+      `SKIP  ${lcdId}.dtr.json — no DTR Questionnaire projected: the policy states no documentation requirements.\n`,
+    );
+  }
   if (results.some(({ exitCode }) => exitCode !== 0)) process.exitCode = 1;
 }
 
@@ -205,7 +224,7 @@ async function runRun(args: readonly string[]): Promise<void> {
     throw new Error(`Review rejected — ${result.lcdId} was not projected.`);
   }
   const { paths } = await projectAndWrite(result.lcdId);
-  process.stdout.write(`${paths.crd}\n${paths.dtr}\n${paths.planDefinition}\n`);
+  writeProjectedPaths(paths, result.lcdId);
 }
 
 async function runReviewSignal(args: readonly string[]): Promise<void> {

@@ -39,6 +39,24 @@ test('instanceCanonical builds a POC-owned instance canonical URL', () => {
   assert.equal(instanceCanonical('Questionnaire', 'X'), 'http://example.org/pa-fhir-poc/Questionnaire/X');
 });
 
+test('projectLcd omits the Questionnaire when the policy states no documentation requirements', async () => {
+  // dtr-std-questionnaire requires item 1..* (verified against the official
+  // validator with CIGNA-0158), so a zero-documentation policy projects no
+  // Questionnaire rather than a non-conformant empty one.
+  const { projectLcd } = await import('./project.ts');
+  const projected = projectLcd(
+    syntheticSubgraph({
+      requirements: [{ id: 'TEST-P-LCD1-R1', text: 'Indication only.', ordinal: 1, category: 'indication' }],
+    }),
+  );
+  assert.equal(projected.dtr, undefined);
+  assert.ok(projected.crd);
+  assert.ok(projected.planDefinition);
+
+  const withDocs = projectLcd(syntheticSubgraph());
+  assert.ok(withDocs.dtr);
+});
+
 test('buildDtrQuestionnaire sets resourceType, meta.profile, status, url/version/title/name', () => {
   const questionnaire = buildDtrQuestionnaire(syntheticSubgraph());
 
