@@ -1,8 +1,8 @@
 # Payer dialect seam — design
 
 Date: 2026-08-22
-Status: decisions settled in brainstorm; awaiting spec review
-Visual companion: https://claude.ai/code/artifact/b151d363-9b6b-4a7d-92e8-2bbdd2ef944c
+Status: implemented — CIGNA-0158 ships as the third fixture
+(see `docs/conformance/CIGNA-0158.md` for the conformance evidence)
 
 ## Goal
 

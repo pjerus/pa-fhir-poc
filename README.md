@@ -313,8 +313,7 @@ Java, or the network.
   every canonical URL), `validate.ts` (M6 runner)
 - `cli.ts` — the single orchestration entrypoint for every verb above
 - `docs/examples/` — committed artifacts; `docs/conformance/` — validator
-  evidence; `docs/backlog.md` — deliberate deferrals; `docs/plans/` —
-  per-milestone implementation plans
+  evidence; `docs/backlog.md` — deliberate deferrals
 - `PA-AI-POC-PLAN.md` — the original scope and milestone plan
 
 ## 11. License

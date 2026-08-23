@@ -2,6 +2,16 @@ node_modules/
 .env
 out/
 
+# Internal working docs — kept locally, not published.
+# The payer-dialect seam design under docs/superpowers/specs/ is the one
+# deliberate exception (linked from the README and pjerus.github.io).
+CLAUDE.md
+docs/checkpoints/
+docs/plans/
+docs/superpowers/plans/
+docs/superpowers/specs/*
+!docs/superpowers/specs/2026-08-22-payer-dialect-seam-design.md
+
 # Human-supplied Medicare Coverage Database exports (see README) — not redistributed here.
 fixtures/*.pdf
 
