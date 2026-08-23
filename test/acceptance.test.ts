@@ -37,8 +37,8 @@ for (const lcdId of lcdIds) {
       timeout: EXTRACTION_TIMEOUT_MS,
       skip: hasPdf
         ? false
-        : `${pdfPath} missing. Committed fixtures should always be present; fetch-gated fixtures ` +
-          '(copyrighted sources, e.g. CIGNA-0158) are downloaded by their tools/fetch-*.sh script.',
+        : `${pdfPath} missing. Human-supplied fixtures (MCD "Create PDF" exports): see README; ` +
+          'fetch-gated fixtures (copyrighted sources, e.g. CIGNA-0158): run their tools/fetch-*.sh script.',
     },
     async () => {
       const expectedPath = join(FIXTURES_DIR, `${lcdId}${EXPECTED_SUFFIX}`);
