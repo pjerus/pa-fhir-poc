@@ -192,6 +192,54 @@ test('loadSubgraph removes the REQUIRES edge for a requirement dropped from re-e
   assert.ok(orphan, 'the orphaned Requirement node should still exist');
 });
 
+function cignaLcdFixture(): LcdInput {
+  return {
+    id: 'TEST-W-CIG1',
+    sourceHash: 'TEST-W-hash-cig',
+    requirements: [{ id: 'TEST-W-CIG1-R1', text: 'Criterion.', ordinal: 1, category: 'indication' }],
+    coveredCodes: [{ system: 'CPT', code: 'TEST-W-11111' }],
+    denialReasons: [
+      {
+        id: 'TEST-W-CIG1-D1',
+        text: 'Stand-alone removal is not medically necessary.',
+        stance: 'not-medically-necessary',
+        appliesTo: [{ system: 'CPT', code: 'TEST-W-22222' }],
+      },
+    ],
+  };
+}
+
+test('an articleless LCD with denialReasons writes DEFINES from the LCD and APPLIES_TO to codes', async () => {
+  await cleanupTestData();
+  await loadSubgraph(graph, { lcd: cignaLcdFixture() });
+  const rows = await graph.run(`
+    MATCH (:LCD {id: 'TEST-W-CIG1'})-[:DEFINES]->(d:DenialReason)-[:APPLIES_TO]->(c:Code)
+    RETURN d.id AS id, d.stance AS stance, c.code AS code
+  `);
+  assert.deepEqual(rows, [{ id: 'TEST-W-CIG1-D1', stance: 'not-medically-necessary', code: 'TEST-W-22222' }]);
+});
+
+test('re-loading with a changed denial set removes stale DEFINES and APPLIES_TO edges', async () => {
+  await cleanupTestData();
+  await loadSubgraph(graph, { lcd: cignaLcdFixture() });
+  await loadSubgraph(graph, {
+    lcd: {
+      ...cignaLcdFixture(),
+      denialReasons: [
+        { id: 'TEST-W-CIG1-D2', text: 'Different reason.', stance: 'experimental-investigational', appliesTo: [] },
+      ],
+    },
+  });
+  const defines = await graph.run(`
+    MATCH (:LCD {id: 'TEST-W-CIG1'})-[:DEFINES]->(d:DenialReason) RETURN d.id AS id ORDER BY id
+  `);
+  assert.deepEqual(defines, [{ id: 'TEST-W-CIG1-D2' }]);
+  const applies = await graph.run(`
+    MATCH (:DenialReason {id: 'TEST-W-CIG1-D1'})-[r:APPLIES_TO]->() RETURN count(r) AS n
+  `);
+  assert.equal(Number(applies[0]?.n ?? -1), 0);
+});
+
 test('loadSubgraph removes stale COVERS/LISTS/DEFINES edges when codes and denial reasons are dropped', async () => {
   await cleanupTestData();
   await loadSubgraph(graph, { lcd: lcdFixture(), article: articleFixture() });

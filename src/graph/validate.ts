@@ -58,12 +58,12 @@ async function findDuplicateRequirementText(graph: Graph): Promise<ValidationIss
 async function findOrphanCodes(graph: Graph): Promise<ValidationIssue[]> {
   const rows = await graph.run(`
     MATCH (c:${NODE.CODE})
-    WHERE NOT (()-[:${REL.COVERS}]->(c)) AND NOT (()-[:${REL.LISTS}]->(c))
+    WHERE NOT (()-[:${REL.COVERS}]->(c)) AND NOT (()-[:${REL.LISTS}]->(c)) AND NOT (()-[:${REL.APPLIES_TO}]->(c))
     RETURN c.system AS system, c.code AS code
   `);
   return rows.map((row) => ({
     kind: 'orphan-code',
-    detail: `Code ${row.system as string}/${row.code as string} has no incoming COVERS or LISTS relationship`,
+    detail: `Code ${row.system as string}/${row.code as string} has no incoming COVERS, LISTS, or APPLIES_TO relationship`,
   }));
 }
 
