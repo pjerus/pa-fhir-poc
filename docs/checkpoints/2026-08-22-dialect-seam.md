@@ -1,6 +1,7 @@
 # Checkpoint — 2026-08-22 (evening) — payer dialect seam + CIGNA-0158
 
-Branch: `payer-dialect-seam` (unmerged; merge decision pending).
+Branch: `payer-dialect-seam` — merged to `main` (712cb73) and pushed 2026-08-22.
+Final `npm test`: 235/235, 0 skipped, including all three live acceptance gates.
 Spec: `docs/superpowers/specs/2026-08-22-payer-dialect-seam-design.md`
 Plan: `docs/superpowers/plans/2026-08-22-payer-dialect-seam.md`
 Design companion artifact: https://claude.ai/code/artifact/b151d363-9b6b-4a7d-92e8-2bbdd2ef944c
@@ -49,8 +50,8 @@ Design companion artifact: https://claude.ai/code/artifact/b151d363-9b6b-4a7d-92
 ## Verification state
 
 - Deterministic sweep 232/232 + the new fhir/cli suites (103/103 at the
-  projection change). Final full `npm test` (all three live gates) launched
-  at checkpoint time — result recorded in the session summary/merge message.
+  projection change). Final full `npm test`: **235/235, 0 skipped** —
+  including all three live acceptance gates under the streaming client.
 - Both MAC fixtures re-verified post-change: L33822 double-PASS via the
   validator; MAC acceptance gates re-run under the streaming client as part
   of the final `npm test`.
