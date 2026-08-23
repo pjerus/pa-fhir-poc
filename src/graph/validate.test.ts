@@ -183,6 +183,17 @@ isolated('validateGraph detects a length-2 Requirement cycle over an arbitrary r
   assert.equal(report.clean, report.issues.length === 0);
 });
 
+isolated('a code reachable only via APPLIES_TO is not an orphan', async () => {
+  await graph.run(`
+    CREATE (d:DenialReason {id: 'TEST-V-AP-D1', text: 'x'})
+    CREATE (c:Code {system: 'CPT', code: 'TEST-V-AP-1'})
+    CREATE (d)-[:APPLIES_TO]->(c)
+    CREATE (:Article {id: 'TEST-V-AP-A1'})-[:DEFINES]->(d)
+  `);
+  const report = await validateGraph(graph);
+  assert.ok(!report.issues.some((issue) => issue.detail.includes('TEST-V-AP-1')));
+});
+
 isolated('validateGraph detects duplicate-code-pair for two Code nodes sharing (system, code)', async () => {
   await graph.run(`
     CREATE (:Code {system: 'TEST-V-DUPSYS', code: 'TEST-V-DUPCODE'})

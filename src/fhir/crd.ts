@@ -53,26 +53,33 @@ function buildDetail(subgraph: ApprovedSubgraph): string {
  */
 export function buildCrdResponse(subgraph: ApprovedSubgraph): CrdResponse {
   const { lcd } = subgraph;
-
-  const summary = `Prior authorization: documentation requirements apply (${lcd.id}${titleClause(lcd.title)})`.slice(
-    0,
-    SUMMARY_MAX_LENGTH,
+  const hasDocumentation = subgraph.requirements.some(
+    (requirement) => requirement.category === 'documentation',
   );
+
+  // A policy with no documentation requirements gets no questionnaire (see
+  // project.ts), so the card must not claim documentation applies or link one.
+  const summary = (hasDocumentation
+    ? `Prior authorization: documentation requirements apply (${lcd.id}${titleClause(lcd.title)})`
+    : `Prior authorization: coverage criteria apply (${lcd.id}${titleClause(lcd.title)})`
+  ).slice(0, SUMMARY_MAX_LENGTH);
 
   return {
     cards: [
       {
         summary,
         indicator: 'info',
-        source: { label: `Medicare LCD ${lcd.id}${titleClause(lcd.title)}` },
+        source: { label: `Coverage policy ${lcd.id}${titleClause(lcd.title)}` },
         detail: buildDetail(subgraph),
-        links: [
-          {
-            label: 'Complete the documentation questionnaire',
-            url: instanceCanonical('Questionnaire', lcd.id),
-            type: 'absolute',
-          },
-        ],
+        links: hasDocumentation
+          ? [
+              {
+                label: 'Complete the documentation questionnaire',
+                url: instanceCanonical('Questionnaire', lcd.id),
+                type: 'absolute',
+              },
+            ]
+          : [],
       },
     ],
   };

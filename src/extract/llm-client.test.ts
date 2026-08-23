@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { stubOllama } from '../../test/support/stub-ollama.ts';
 import { createOllamaClient } from './llm-client.ts';
 
-test('asks Ollama for a schema-constrained, non-streaming completion', async () => {
+test('asks Ollama for a schema-constrained, streamed completion', async () => {
   const ollama = await stubOllama(() => ({
     status: 200,
     payload: { response: '{"requirements":[]}', done: true },
@@ -24,13 +24,49 @@ test('asks Ollama for a schema-constrained, non-streaming completion', async () 
         body: {
           model: 'test-model',
           prompt: 'extract the requirements',
-          stream: false,
+          stream: true,
           think: false,
           format: { type: 'object' },
           options: { temperature: 0 },
         },
       },
     ]);
+  } finally {
+    await ollama.close();
+  }
+});
+
+test('concatenates response fragments streamed across NDJSON lines', async () => {
+  const ollama = await stubOllama(() => ({
+    status: 200,
+    lines: [
+      { response: '{"requi' },
+      { response: 'rements":' },
+      { response: '[]}', done: true },
+    ],
+  }));
+
+  try {
+    const client = createOllamaClient({ baseUrl: ollama.baseUrl, model: 'test-model' });
+    const reply = await client.complete({ prompt: 'extract the requirements' });
+    assert.equal(reply, '{"requirements":[]}');
+  } finally {
+    await ollama.close();
+  }
+});
+
+test('fails loudly on an error object streamed mid-response', async () => {
+  const ollama = await stubOllama(() => ({
+    status: 200,
+    lines: [{ response: 'partial' }, { error: 'model crashed' }],
+  }));
+
+  try {
+    const client = createOllamaClient({ baseUrl: ollama.baseUrl, model: 'test-model' });
+    await assert.rejects(
+      () => client.complete({ prompt: 'extract the requirements' }),
+      /model crashed/,
+    );
   } finally {
     await ollama.close();
   }

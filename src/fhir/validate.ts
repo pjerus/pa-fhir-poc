@@ -81,7 +81,16 @@ async function assertExists(path: string, hint: string): Promise<void> {
  */
 export async function validateProjection(lcdId: string, outDir: string): Promise<readonly { run: ValidatorRun; exitCode: number }[]> {
   await assertExists(VALIDATOR_JAR, 'Run: ./tools/fetch-validator.sh');
-  const runs = validatorRuns(lcdId, outDir);
+  // A policy with no documentation requirements projects no Questionnaire
+  // (see project.ts) — that run is skipped, not failed. The PlanDefinition
+  // is always projected, so its absence is still a loud error.
+  const dtrExists = await access(join(outDir, `${lcdId}.dtr.json`)).then(
+    () => true,
+    () => false,
+  );
+  const runs = validatorRuns(lcdId, outDir).filter(
+    (run) => dtrExists || !run.artifactFile.endsWith('.dtr.json'),
+  );
   for (const run of runs) {
     await assertExists(join(outDir, run.artifactFile), `Run: node cli.ts project ${lcdId}`);
   }

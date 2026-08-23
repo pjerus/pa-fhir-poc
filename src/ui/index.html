@@ -29,12 +29,12 @@
   <p class="hint">Drives the LCD/article pipeline from PDF upload through human review to FHIR artifacts. Not a replacement for Temporal Web (workflow visibility) or Neo4j Browser (graph inspection).</p>
 
   <fieldset>
-    <legend>Upload an LCD + article pair</legend>
+    <legend>Upload a policy (LCD + article pair, or a single-document policy)</legend>
     <form class="upload" id="upload-form">
       <label for="lcdPdf">LCD PDF</label>
       <input type="file" id="lcdPdf" name="lcdPdf" accept="application/pdf" required />
-      <label for="articlePdf">Article PDF</label>
-      <input type="file" id="articlePdf" name="articlePdf" accept="application/pdf" required />
+      <label for="articlePdf">Article PDF (MAC pairs only)</label>
+      <input type="file" id="articlePdf" name="articlePdf" accept="application/pdf" />
       <button type="submit">Start pipeline</button>
       <span id="upload-status" class="hint"></span>
     </form>
@@ -226,10 +226,17 @@
     if (subgraph.article) {
       reviewContent.appendChild(el('h3', { text: `Article ${subgraph.article.id} — listed codes` }));
       reviewContent.appendChild(renderCodeList(subgraph.article.listedCodes));
+    }
 
+    if (subgraph.denialReasons.length > 0) {
       reviewContent.appendChild(el('h3', { text: 'Denial reasons' }));
       const denialList = el('ul');
-      for (const reason of subgraph.article.denialReasons) denialList.appendChild(el('li', { text: reason.text }));
+      for (const reason of subgraph.denialReasons) {
+        const suffix = reason.appliesTo.length > 0
+          ? ` [${reason.appliesTo.map((c) => `${c.system} ${c.code}`).join(', ')}]`
+          : '';
+        denialList.appendChild(el('li', { text: `${reason.text}${suffix}` }));
+      }
       reviewContent.appendChild(denialList);
     }
 

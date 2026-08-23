@@ -15,7 +15,9 @@ export interface StubOllama {
 
 export interface StubReply {
   readonly status: number;
-  readonly payload: unknown;
+  readonly payload?: unknown;
+  /** When present, written as NDJSON — one JSON object per line, like Ollama's stream. */
+  readonly lines?: readonly unknown[];
 }
 
 /** A real HTTP server standing in for Ollama, so the adapter is exercised end to end. */
@@ -30,9 +32,13 @@ export async function stubOllama(
     req.on('end', () => {
       const body: unknown = JSON.parse(Buffer.concat(chunks).toString('utf8'));
       requests.push({ url: req.url, body });
-      const { status, payload } = handler(body);
+      const { status, payload, lines } = handler(body);
       res.writeHead(status, { 'content-type': 'application/json' });
-      res.end(JSON.stringify(payload));
+      if (lines !== undefined) {
+        res.end(lines.map((line) => `${JSON.stringify(line)}\n`).join(''));
+      } else {
+        res.end(JSON.stringify(payload));
+      }
     });
   });
 

@@ -1,10 +1,11 @@
 import { createHash } from 'node:crypto';
 
 import type { CodeRef, DenialReason } from '../types.ts';
+import { MAC_VOCABULARY } from './dialects/mac.ts';
 import { lcdIdFromPath } from './extract.ts';
 import type { LlmClient } from './llm-client.ts';
 import { extractPdfText } from './pdf-text.ts';
-import { cutAtRevisionHistory } from './sections.ts';
+import { cutAtTerminal } from './sections.ts';
 
 export interface ArticleSnapshot {
   readonly id: string;
@@ -48,7 +49,7 @@ function firstMatch(text: string, pattern: RegExp): FlatMatch | null {
  * or period (a list item, a sentence) is only recognised when the
  * punctuation itself isn't glued onto the token by the source text.
  */
-function tokensMatching(text: string, shape: RegExp): string[] {
+export function tokensMatching(text: string, shape: RegExp): string[] {
   const seen = new Set<string>();
   const tokens: string[] = [];
   for (const token of text.split(/\s+/)) {
@@ -345,7 +346,7 @@ export async function parseArticleText(
 export async function extractArticle(pdfPath: string, llm: LlmClient): Promise<ArticleExtractionResult> {
   const articleId = lcdIdFromPath(pdfPath);
   const { text } = await extractPdfText(pdfPath);
-  const cutText = cutAtRevisionHistory(text);
+  const cutText = cutAtTerminal(text, MAC_VOCABULARY.terminal);
   const snapshot = await parseArticleText(cutText, articleId, llm);
 
   return {

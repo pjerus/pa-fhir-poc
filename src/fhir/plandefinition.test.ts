@@ -56,8 +56,8 @@ test('buildPlanDefinition throws when a covered code has an unknown system', () 
   assert.throws(
     () =>
       buildPlanDefinition(
-        syntheticSubgraph({ coveredCodes: [{ system: 'CPT', code: '12345' }] }),
+        syntheticSubgraph({ coveredCodes: [{ system: 'SNOMED', code: '12345' }] }),
       ),
-    /CPT/,
+    /SNOMED/,
   );
 });

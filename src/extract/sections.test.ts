@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { cutAtRevisionHistory, splitSections } from './sections.ts';
+import type { SectionVocabulary } from './sections.ts';
+import { cutAtTerminal, splitSections } from './sections.ts';
+import { MAC_VOCABULARY } from './dialects/mac.ts';
 
 test('splits a policy into its three sections by heading', () => {
   const text = [
@@ -17,7 +19,7 @@ test('splits a policy into its three sections by heading', () => {
     'More than one unit per month is not reasonable and necessary.',
   ].join('\n');
 
-  const { sections } = splitSections(text);
+  const { sections } = splitSections(text, MAC_VOCABULARY);
 
   assert.equal(sections.indications, 'The patient must have a documented diagnosis.');
   assert.equal(sections.documentation, 'The medical record must contain the treating order.');
@@ -34,7 +36,7 @@ test('does not treat a prose sentence mentioning a section word as a heading', (
     'Documentation of that diagnosis must be available upon request.',
   ].join('\n');
 
-  const { sections } = splitSections(text);
+  const { sections } = splitSections(text, MAC_VOCABULARY);
 
   assert.equal(
     sections.indications,
@@ -52,7 +54,7 @@ test('feeds a combined heading to every section it names', () => {
     'The treating order must be retained and available on request.',
   ].join('\n');
 
-  const { sections } = splitSections(text);
+  const { sections } = splitSections(text, MAC_VOCABULARY);
 
   assert.equal(sections.indications, 'The device is covered when the patient meets the criteria below.');
   assert.equal(sections.limitations, 'The device is covered when the patient meets the criteria below.');
@@ -67,7 +69,7 @@ test('a hard-wrapped fragment starting lowercase is never a heading', () => {
     'Excessive daytime sleepiness or impaired cognition',
   ].join('\n');
 
-  const { sections } = splitSections(text);
+  const { sections } = splitSections(text, MAC_VOCABULARY);
 
   assert.equal(sections.documentation, null);
   assert.ok(sections.indications?.includes('Excessive daytime sleepiness'));
@@ -81,7 +83,7 @@ test('a line starting with a digit or a quote is never a heading', () => {
     'The criteria of both policies must be met.',
   ].join('\n');
 
-  const { sections } = splitSections(text);
+  const { sections } = splitSections(text, MAC_VOCABULARY);
 
   assert.equal(sections.documentation, null);
   assert.equal(sections.limitations, null);
@@ -96,7 +98,7 @@ test('a cross-reference naming a section deep in the line is not a heading', () 
     'Necessity for other coverage criteria',
   ].join('\n');
 
-  const { sections } = splitSections(text);
+  const { sections } = splitSections(text, MAC_VOCABULARY);
 
   assert.equal(sections.limitations, null);
   assert.ok(sections.indications?.includes('Necessity for other coverage criteria'));
@@ -110,7 +112,7 @@ test('a heading may carry a qualifier prefix before its section word', () => {
     'The order must be retained.',
   ].join('\n');
 
-  const { sections } = splitSections(text);
+  const { sections } = splitSections(text, MAC_VOCABULARY);
 
   assert.equal(sections.documentation, 'The order must be retained.');
 });
@@ -118,7 +120,7 @@ test('a heading may carry a qualifier prefix before its section word', () => {
 test('warns instead of crashing when a section heading is absent', () => {
   const text = ['Indications', 'The patient must have a documented diagnosis.'].join('\n');
 
-  const { sections, warnings } = splitSections(text);
+  const { sections, warnings } = splitSections(text, MAC_VOCABULARY);
 
   assert.equal(sections.documentation, null);
   assert.equal(sections.limitations, null);
@@ -138,7 +140,7 @@ test('a heading-candidate line repeated more than 3 times is a recurring table l
     'LIMITATION',
   ].join('\n');
 
-  const { sections, warnings } = splitSections(text);
+  const { sections, warnings } = splitSections(text, MAC_VOCABULARY);
 
   assert.equal(sections.indications, 'Real indications text.');
   assert.equal(sections.limitations, null);
@@ -149,18 +151,18 @@ test('a heading-candidate line repeated more than 3 times is a recurring table l
   );
 });
 
-test('cutAtRevisionHistory returns the text up to that heading', () => {
+test('cutAtTerminal returns the text up to that heading', () => {
   const before = 'Some policy text before the cutoff.';
   const after = 'Indications: this must not resurface after the cutoff.';
   const text = [before, 'Revision History', after].join('\n');
 
-  assert.equal(cutAtRevisionHistory(text), before);
+  assert.equal(cutAtTerminal(text, MAC_VOCABULARY.terminal), before);
 });
 
-test('cutAtRevisionHistory returns the whole input when the heading is absent', () => {
+test('cutAtTerminal returns the whole input when the heading is absent', () => {
   const text = ['Line one.', 'Line two.'].join('\n');
 
-  assert.equal(cutAtRevisionHistory(text), text);
+  assert.equal(cutAtTerminal(text, MAC_VOCABULARY.terminal), text);
 });
 
 test('revision history is terminal: no later heading can resume section assignment', () => {
@@ -172,7 +174,7 @@ test('revision history is terminal: no later heading can resume section assignme
     'This is change-log boilerplate and must not be captured.',
   ].join('\n');
 
-  const { sections, warnings } = splitSections(text);
+  const { sections, warnings } = splitSections(text, MAC_VOCABULARY);
 
   assert.equal(sections.indications, 'Real indications text.');
   assert.equal(sections.documentation, null);
@@ -181,4 +183,40 @@ test('revision history is terminal: no later heading can resume section assignme
       'No "documentation" heading found; downstream extraction will skip that section.',
     ),
   );
+});
+
+test('splitSections takes a vocabulary: MAC vocabulary reproduces current behavior', () => {
+  const text = ['Coverage Indications', 'Body A.', 'Documentation Requirements', 'Body B.'].join('\n');
+  const { sections } = splitSections(text, MAC_VOCABULARY);
+  assert.equal(sections.indications, 'Body A.');
+  assert.equal(sections.documentation, 'Body B.');
+});
+
+test('a boundary heading ends the current section without opening one', () => {
+  const vocabulary: SectionVocabulary = {
+    headings: [{ sections: ['indications'], pattern: /^Coverage\s+Policy\b/i }],
+    boundaries: [/^General\s+Background\b/i],
+    terminal: /revision\s+details/i,
+  };
+  const text = ['Coverage Policy', 'Real criterion.', 'General Background', 'Literature noise.'].join('\n');
+  const { sections } = splitSections(text, vocabulary);
+  assert.equal(sections.indications, 'Real criterion.');
+});
+
+test('a dot-leader table-of-contents line is never a heading', () => {
+  const vocabulary: SectionVocabulary = {
+    headings: [{ sections: ['indications'], pattern: /^Coverage\s+Policy\b/i }],
+    boundaries: [],
+    terminal: /revision\s+details/i,
+  };
+  const text = ['Coverage Policy ......................... 2', 'TOC junk.', 'Coverage Policy', 'Real criterion.'].join(
+    '\n',
+  );
+  const { sections } = splitSections(text, vocabulary);
+  assert.equal(sections.indications, 'Real criterion.');
+});
+
+test('cutAtTerminal cuts at the supplied terminal heading', () => {
+  const text = ['Keep this.', 'Revision Details', 'Change log.'].join('\n');
+  assert.equal(cutAtTerminal(text, /revision\s+details/i), 'Keep this.');
 });

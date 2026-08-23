@@ -8,14 +8,24 @@ import { buildPlanDefinition } from './plandefinition.ts';
 
 export interface ProjectedLcd {
   readonly crd: CrdResponse;
-  readonly dtr: Questionnaire;
+  /**
+   * Absent when the policy states no documentation requirements:
+   * dtr-std-questionnaire requires at least one item, so an empty
+   * Questionnaire would be non-conformant — and a questionnaire with
+   * nothing to ask serves no DTR purpose. Verified against the official
+   * validator with CIGNA-0158 (see docs/conformance/).
+   */
+  readonly dtr?: Questionnaire;
   readonly planDefinition: PlanDefinition;
 }
 
 export function projectLcd(subgraph: ApprovedSubgraph): ProjectedLcd {
+  const hasDocumentation = subgraph.requirements.some(
+    (requirement) => requirement.category === 'documentation',
+  );
   return {
     crd: buildCrdResponse(subgraph),
-    dtr: buildDtrQuestionnaire(subgraph),
+    ...(hasDocumentation ? { dtr: buildDtrQuestionnaire(subgraph) } : {}),
     planDefinition: buildPlanDefinition(subgraph),
   };
 }

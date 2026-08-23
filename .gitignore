@@ -5,6 +5,9 @@ out/
 # Human-supplied Medicare Coverage Database exports (see README) — not redistributed here.
 fixtures/*.pdf
 
+# Cigna coverage policy is copyrighted; fetched by tools/fetch-cigna-0158.sh, never committed.
+fixtures/CIGNA-0158.pdf
+
 # M6 validator: pinned jar fetched by tools/fetch-validator.sh; IG package cache.
 tools/validator_cli.jar
 .fhir/

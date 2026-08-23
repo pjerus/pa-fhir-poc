@@ -52,6 +52,9 @@ test('validate', async (t) => {
     const { code, stderr } = await runCli(['validate', 'L99999'], cwd);
     assert.equal(code, 1);
     assert.match(stderr, /node cli\.ts project L99999/);
-    assert.match(stderr, /L99999\.dtr\.json/);
+    // The PlanDefinition is projected for every policy, so its absence is the
+    // loud never-projected signal (a missing dtr.json alone is a legitimate
+    // skip for zero-documentation policies).
+    assert.match(stderr, /L99999\.plandefinition\.json/);
   });
 });

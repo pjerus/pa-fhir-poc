@@ -232,7 +232,7 @@ test('parseArticleText: throws with both raw replies when the retry also fails',
   );
 });
 
-// ---- extractArticle (pdf-text + cutAtRevisionHistory + parseArticleText) --
+// ---- extractArticle (pdf-text + cutAtTerminal + parseArticleText) --
 
 test('extractArticle: derives the article id from the PDF filename', async () => {
   const llm = fakeLlm([]);
@@ -243,7 +243,7 @@ test('extractArticle: derives the article id from the PDF filename', async () =>
       assert.ok(error instanceof Error);
       // The sample PDF has no ICD-10 heading, so the deterministic parser
       // fails loud before the LLM is ever invoked -- proving the pdf-text +
-      // cutAtRevisionHistory + parseArticleText wiring runs in order.
+      // cutAtTerminal + parseArticleText wiring runs in order.
       assert.match(error.message, /ICD-10-CM Codes That Support Medical Necessity/i);
       return true;
     },

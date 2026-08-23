@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { access } from 'node:fs/promises';
 
+import { sniffPdfDialect } from './src/extract/dialects/index.ts';
 import { createOllamaClient } from './src/extract/llm-client.ts';
 import {
   extractAndSnapshot,
@@ -17,7 +18,7 @@ import { validateGraph } from './src/graph/validate.ts';
 import { OUT_DIR, projectAndWrite } from './src/fhir/write.ts';
 import { validateProjection } from './src/fhir/validate.ts';
 import { awaitReview, signalReview, startReview } from './src/workflow/client.ts';
-import type { ArticleInput, LcdInput, ReviewDecision } from './src/types.ts';
+import type { LcdInput, ReviewDecision } from './src/types.ts';
 
 const DEFAULT_OLLAMA_URL = 'http://localhost:11434';
 const DEFAULT_EXTRACTION_MODEL = 'qwen3.8:27b';
@@ -31,7 +32,7 @@ const USAGE = `Usage:
                                                                 Deliver a human review decision to a running workflow
   node cli.ts project <lcdId>                                  Project an approved LCD to CRD/DTR/PlanDefinition FHIR artifacts
   node cli.ts validate <lcdId>                                 Validate projected artifacts with the official HL7 validator (Docker; run tools/fetch-validator.sh once first)
-  node cli.ts run <lcd.pdf> <article.pdf>                      Extract both, start review, block for a human signal, then project on approval
+  node cli.ts run <policy.pdf> [article.pdf]                   Extract (article for MAC pairs), start review, block for a human signal, then project on approval
 
 Environment:
   OLLAMA_URL         default ${DEFAULT_OLLAMA_URL}
@@ -68,12 +69,17 @@ async function runLoad(args: readonly string[]): Promise<void> {
   if (lcdId === undefined) throw new Error(`load needs an LCD id.\n\n${USAGE}`);
 
   const snapshot = await readExtractedSnapshot(lcdId);
+  if (snapshot.dialect === 'cigna' && articleId !== undefined) {
+    throw new Error(`${snapshot.lcdId} is a single-document policy — do not pass an articleId.\n\n${USAGE}`);
+  }
+
   const articleSnapshot = articleId === undefined ? undefined : await readArticleSnapshot(articleId);
   const lcd: LcdInput = {
     id: snapshot.lcdId,
     sourceHash: snapshot.sourceHash,
     requirements: snapshot.requirements,
     coveredCodes: unionCodes(snapshot.hcpcsCodes, articleSnapshot?.hcpcsCodes ?? []),
+    ...(snapshot.denialReasons !== undefined ? { denialReasons: snapshot.denialReasons } : {}),
   };
 
   const graph = createGraph(loadGraphConfig());
@@ -93,12 +99,17 @@ async function runReviewStart(args: readonly string[]): Promise<void> {
   if (lcdId === undefined) throw new Error(`review-start needs an LCD id.\n\n${USAGE}`);
 
   const snapshot = await readExtractedSnapshot(lcdId);
+  if (snapshot.dialect === 'cigna' && articleId !== undefined) {
+    throw new Error(`${snapshot.lcdId} is a single-document policy — do not pass an articleId.\n\n${USAGE}`);
+  }
+
   const articleSnapshot = articleId === undefined ? undefined : await readArticleSnapshot(articleId);
   const lcd: LcdInput = {
     id: snapshot.lcdId,
     sourceHash: snapshot.sourceHash,
     requirements: snapshot.requirements,
     coveredCodes: unionCodes(snapshot.hcpcsCodes, articleSnapshot?.hcpcsCodes ?? []),
+    ...(snapshot.denialReasons !== undefined ? { denialReasons: snapshot.denialReasons } : {}),
   };
 
   const workflowId = await startReview(
@@ -116,7 +127,21 @@ async function runProject(args: readonly string[]): Promise<void> {
   if (lcdId === undefined) throw new Error(`project needs an LCD id.\n\n${USAGE}`);
 
   const { paths } = await projectAndWrite(lcdId);
-  process.stdout.write(`${paths.crd}\n${paths.dtr}\n${paths.planDefinition}\n`);
+  writeProjectedPaths(paths, lcdId);
+}
+
+function writeProjectedPaths(
+  paths: { readonly crd: string; readonly dtr?: string; readonly planDefinition: string },
+  lcdId: string,
+): void {
+  const lines = [paths.crd, ...(paths.dtr !== undefined ? [paths.dtr] : []), paths.planDefinition];
+  process.stdout.write(`${lines.join('\n')}\n`);
+  if (paths.dtr === undefined) {
+    process.stderr.write(
+      `No DTR Questionnaire emitted: ${lcdId} states no documentation requirements ` +
+        '(dtr-std-questionnaire requires at least one item).\n',
+    );
+  }
 }
 
 async function assertFileExists(path: string, label: string): Promise<void> {
@@ -140,35 +165,54 @@ async function runValidate(args: readonly string[]): Promise<void> {
   process.stdout.write(
     `SKIP  ${lcdId}.crd.json — CRD card is a CDS Hooks logical model under CRD v2.2.1, not a FHIR resource instance; no StructureDefinition applies.\n`,
   );
+  if (!results.some(({ run }) => run.artifactFile.endsWith('.dtr.json'))) {
+    process.stdout.write(
+      `SKIP  ${lcdId}.dtr.json — no DTR Questionnaire projected: the policy states no documentation requirements.\n`,
+    );
+  }
   if (results.some(({ exitCode }) => exitCode !== 0)) process.exitCode = 1;
 }
 
 async function runRun(args: readonly string[]): Promise<void> {
   const [lcdPath, articlePath] = args;
-  if (lcdPath === undefined || articlePath === undefined) {
-    throw new Error(`run needs a path to the LCD PDF and a path to the article PDF.\n\n${USAGE}`);
+  if (lcdPath === undefined) {
+    throw new Error(`run needs a path to the policy PDF (and, for MAC documents, the article PDF).\n\n${USAGE}`);
   }
+  await assertFileExists(lcdPath, 'Policy PDF');
 
-  await assertFileExists(lcdPath, 'LCD PDF');
-  await assertFileExists(articlePath, 'Article PDF');
+  const dialect = await sniffPdfDialect(lcdPath);
+  if (dialect.articleExpectation === 'required' && articlePath === undefined) {
+    throw new Error(`Dialect "${dialect.name}" pairs the policy with an article PDF: node cli.ts run <lcd.pdf> <article.pdf>\n\n${USAGE}`);
+  }
+  if (dialect.articleExpectation === 'none' && articlePath !== undefined) {
+    throw new Error(`Dialect "${dialect.name}" is a single-document policy — do not pass an article PDF.\n\n${USAGE}`);
+  }
+  if (articlePath !== undefined) await assertFileExists(articlePath, 'Article PDF');
 
   const lcdResult = await extractAndSnapshot(lcdPath, ollamaClient());
-  const articleResult = await extractArticleAndSnapshot(articlePath, ollamaClient());
+  const articleResult = articlePath === undefined ? undefined : await extractArticleAndSnapshot(articlePath, ollamaClient());
 
   const lcd: LcdInput = {
     id: lcdResult.lcdId,
     sourceHash: lcdResult.sourceHash,
     requirements: lcdResult.requirements,
-    coveredCodes: unionCodes(lcdResult.hcpcsCodes, articleResult.hcpcsCodes),
-  };
-  const article: ArticleInput = {
-    id: articleResult.id,
-    sourceHash: articleResult.sourceHash,
-    listedCodes: articleResult.listedCodes,
-    denialReasons: articleResult.denialReasons,
+    coveredCodes: unionCodes(lcdResult.hcpcsCodes, articleResult?.hcpcsCodes ?? []),
+    ...(lcdResult.denialReasons !== undefined ? { denialReasons: lcdResult.denialReasons } : {}),
   };
 
-  const workflowId = await startReview({ lcd, article });
+  const workflowId = await startReview(
+    articleResult === undefined
+      ? { lcd }
+      : {
+          lcd,
+          article: {
+            id: articleResult.id,
+            sourceHash: articleResult.sourceHash,
+            listedCodes: articleResult.listedCodes,
+            denialReasons: articleResult.denialReasons,
+          },
+        },
+  );
   process.stdout.write(`${workflowId}\n`);
   process.stderr.write(
     `Run a worker to process this review: node src/workflow/worker.ts\n` +
@@ -180,7 +224,7 @@ async function runRun(args: readonly string[]): Promise<void> {
     throw new Error(`Review rejected — ${result.lcdId} was not projected.`);
   }
   const { paths } = await projectAndWrite(result.lcdId);
-  process.stdout.write(`${paths.crd}\n${paths.dtr}\n${paths.planDefinition}\n`);
+  writeProjectedPaths(paths, result.lcdId);
 }
 
 async function runReviewSignal(args: readonly string[]): Promise<void> {

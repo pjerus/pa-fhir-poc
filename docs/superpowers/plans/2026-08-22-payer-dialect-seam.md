@@ -618,7 +618,9 @@ git add src/extract/dialects/cigna.ts src/extract/dialects/cigna.test.ts
 git commit -m "extract: Cigna section vocabulary"
 ```
 
----### Task 4: Domain types + Cigna coding-information parser
+---
+
+### Task 4: Domain types + Cigna coding-information parser
 
 The stance-stratified code tables: each table is headed by the stance statement itself, so parse the Coding Information region into (statement, stance, codes) groups deterministically — no LLM.
 

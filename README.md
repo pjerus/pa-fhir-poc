@@ -35,8 +35,12 @@ reviewer's approval, recorded on the graph.
 
 ## 1. See the output without running anything
 
-The three artifacts projected from each reviewed graph are committed as
-[`docs/examples/`](docs/examples/), for both demonstration LCDs:
+The artifacts projected from each reviewed graph are committed as
+[`docs/examples/`](docs/examples/), for both demonstration LCDs (a policy
+that states no documentation requirements — e.g. the CIGNA-0158 third
+fixture — projects no DTR Questionnaire, because `dtr-std-questionnaire`
+requires at least one item; see
+[`docs/conformance/CIGNA-0158.md`](docs/conformance/CIGNA-0158.md)):
 
 - [`L33822.dtr.json`](docs/examples/L33822.dtr.json) /
   [`L33718.dtr.json`](docs/examples/L33718.dtr.json) — DTR Questionnaire, one
@@ -47,6 +51,11 @@ The three artifacts projected from each reviewed graph are committed as
 - [`L33822.plandefinition.json`](docs/examples/L33822.plandefinition.json) /
   [`L33718.plandefinition.json`](docs/examples/L33718.plandefinition.json) —
   PlanDefinition linking each covered code to the questionnaire.
+- [`CIGNA-0158.crd.json`](docs/examples/CIGNA-0158.crd.json) /
+  [`CIGNA-0158.plandefinition.json`](docs/examples/CIGNA-0158.plandefinition.json)
+  — the commercial-payer third fixture (single-document Cigna dialect):
+  CPT + HCPCS covered codes; no Questionnaire, because the policy states no
+  documentation requirements.
 
 ## 2. What's proven vs. deliberately deferred
 
@@ -116,6 +125,13 @@ projecting a draft throws.
   they cannot be fetched programmatically and are not redistributed in this
   repository. Every stage that needs them fails loudly with the exact path
   it expected if they are absent.
+- **Third fixture (CIGNA-0158, single-document dialect):** unlike the
+  public-domain CMS documents above, Cigna's coverage policy is copyrighted,
+  so `fixtures/CIGNA-0158.pdf` is deliberately not committed. Fetch it with
+  `./tools/fetch-cigna-0158.sh`, then run it through the same pipeline with
+  no article argument: `node cli.ts run fixtures/CIGNA-0158.pdf`. If the PDF
+  is absent, `npm test`'s acceptance gate skips that LCD's ground-truth test
+  with an explanatory message rather than failing.
 
 ## 5. Setup
 
@@ -152,6 +168,10 @@ node src/workflow/worker.ts
 ```bash
 node cli.ts run fixtures/L33822.pdf fixtures/A52464.pdf
 ```
+
+(General form: `node cli.ts run <policy.pdf> [article.pdf]` — the article is
+required for MAC LCDs and rejected for single-document Cigna policies, per
+the sniffed dialect.)
 
 This extracts both PDFs, starts the review workflow (whose first activity
 loads the graph), prints the workflow id, and then blocks. That block is the

@@ -18,6 +18,7 @@ test('turns a model response into ordinal-numbered typed requirements', async ()
     {
       lcdId: 'L00001',
       sections: { indications: 'some policy prose', documentation: null, limitations: null },
+      documentName: 'Medicare coverage policy',
     },
     llm,
   );
@@ -45,6 +46,7 @@ test('retries once with a sharper instruction when the model returns unusable ou
     {
       lcdId: 'L00001',
       sections: { indications: 'some policy prose', documentation: null, limitations: null },
+      documentName: 'Medicare coverage policy',
     },
     llm,
   );
@@ -66,6 +68,7 @@ test('throws with the raw model output when the retry also fails', async () => {
         {
           lcdId: 'L00001',
           sections: { indications: 'some policy prose', documentation: null, limitations: null },
+      documentName: 'Medicare coverage policy',
         },
         llm,
       ),
@@ -91,7 +94,11 @@ test('sends a body shared by a combined heading to the model only once', async (
   ]);
 
   const requirements = await structureRequirements(
-    { lcdId: 'L00001', sections: { indications: shared, documentation: null, limitations: shared } },
+    {
+      lcdId: 'L00001',
+      sections: { indications: shared, documentation: null, limitations: shared },
+      documentName: 'Medicare coverage policy',
+    },
     llm,
   );
 

@@ -18,6 +18,10 @@ test('codeSystemUri returns the verified ICD-10-CM canonical', () => {
   assert.equal(codeSystemUri('ICD-10-CM'), 'http://hl7.org/fhir/sid/icd-10-cm');
 });
 
+test('CPT maps to the AMA canonical', () => {
+  assert.equal(codeSystemUri('CPT'), 'http://www.ama-assn.org/go/cpt');
+});
+
 test('codeSystemUri throws naming the unknown system and the known systems', () => {
   assert.throws(
     () => codeSystemUri('SNOMED'),
@@ -33,6 +37,24 @@ test('codeSystemUri throws naming the unknown system and the known systems', () 
 
 test('instanceCanonical builds a POC-owned instance canonical URL', () => {
   assert.equal(instanceCanonical('Questionnaire', 'X'), 'http://example.org/pa-fhir-poc/Questionnaire/X');
+});
+
+test('projectLcd omits the Questionnaire when the policy states no documentation requirements', async () => {
+  // dtr-std-questionnaire requires item 1..* (verified against the official
+  // validator with CIGNA-0158), so a zero-documentation policy projects no
+  // Questionnaire rather than a non-conformant empty one.
+  const { projectLcd } = await import('./project.ts');
+  const projected = projectLcd(
+    syntheticSubgraph({
+      requirements: [{ id: 'TEST-P-LCD1-R1', text: 'Indication only.', ordinal: 1, category: 'indication' }],
+    }),
+  );
+  assert.equal(projected.dtr, undefined);
+  assert.ok(projected.crd);
+  assert.ok(projected.planDefinition);
+
+  const withDocs = projectLcd(syntheticSubgraph());
+  assert.ok(withDocs.dtr);
 });
 
 test('buildDtrQuestionnaire sets resourceType, meta.profile, status, url/version/title/name', () => {

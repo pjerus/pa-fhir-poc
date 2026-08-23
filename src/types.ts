@@ -22,9 +22,18 @@ export interface CodeRef {
   readonly code: string;
 }
 
+/** How a payer's stance statement refuses coverage. Absent on MAC-sourced denial reasons. */
+export type DenialStance = 'not-medically-necessary' | 'experimental-investigational';
+
 export interface DenialReason {
   readonly id: string;
   readonly text: string;
+  readonly stance?: DenialStance;
+}
+
+/** A denial reason plus the codes its source document explicitly groups under it. */
+export interface PolicyDenialReason extends DenialReason {
+  readonly appliesTo: readonly CodeRef[];
 }
 
 export interface LcdInput {
@@ -34,6 +43,8 @@ export interface LcdInput {
   readonly sourceHash: string;
   readonly requirements: readonly Requirement[];
   readonly coveredCodes: readonly CodeRef[];
+  /** Present for single-document dialects whose policy states its own denial reasons. */
+  readonly denialReasons?: readonly PolicyDenialReason[];
 }
 
 export interface ArticleInput {

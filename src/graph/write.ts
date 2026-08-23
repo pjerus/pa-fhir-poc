@@ -21,6 +21,19 @@ export async function loadSubgraph(graph: Graph, input: LoadSubgraphInput): Prom
   await cleanupStaleRequires(graph, lcd);
   await cleanupStaleCovers(graph, lcd);
 
+  if (lcd.denialReasons !== undefined) {
+    await upsertLcdDenialReasons(graph, lcd);
+    await upsertAppliesTo(graph, lcd);
+  }
+  // Cleanups run unconditionally: a re-extraction that yields zero denial
+  // reasons omits the key entirely, and stale LCD-anchored edges must not
+  // survive that load. For MAC LCDs (which never acquire LCD-anchored
+  // DEFINES) both are no-ops.
+  // Order matters: stale APPLIES_TO edges are found by walking DEFINES, so
+  // they must be cleaned while the stale DEFINES edges still exist.
+  await cleanupStaleAppliesTo(graph, lcd);
+  await cleanupStaleLcdDefines(graph, lcd);
+
   if (article !== undefined) {
     await upsertArticle(graph, lcd.id, article);
     await upsertListedCodes(graph, article);
@@ -93,6 +106,65 @@ async function cleanupStaleCovers(graph: Graph, lcd: LcdInput): Promise<void> {
     DELETE rel
     `,
     { lcdId: lcd.id, codes: lcd.coveredCodes },
+  );
+}
+
+async function upsertLcdDenialReasons(graph: Graph, lcd: LcdInput): Promise<void> {
+  await graph.run(
+    `
+    MATCH (lcd:${NODE.LCD} {id: $lcdId})
+    UNWIND $denialReasons AS dr
+    MERGE (d:${NODE.DENIAL_REASON} {id: dr.id})
+    SET d.text = dr.text, d.stance = dr.stance
+    MERGE (lcd)-[:${REL.DEFINES}]->(d)
+    `,
+    {
+      lcdId: lcd.id,
+      denialReasons: (lcd.denialReasons ?? []).map(({ id, text, stance }) => ({ id, text, stance: stance ?? null })),
+    },
+  );
+}
+
+async function upsertAppliesTo(graph: Graph, lcd: LcdInput): Promise<void> {
+  await graph.run(
+    `
+    UNWIND $pairs AS pair
+    MATCH (d:${NODE.DENIAL_REASON} {id: pair.denialReasonId})
+    MERGE (c:${NODE.CODE} {system: pair.system, code: pair.code})
+    MERGE (d)-[:${REL.APPLIES_TO}]->(c)
+    `,
+    {
+      pairs: (lcd.denialReasons ?? []).flatMap((dr) =>
+        dr.appliesTo.map((code) => ({ denialReasonId: dr.id, system: code.system, code: code.code })),
+      ),
+    },
+  );
+}
+
+async function cleanupStaleLcdDefines(graph: Graph, lcd: LcdInput): Promise<void> {
+  await graph.run(
+    `
+    MATCH (lcd:${NODE.LCD} {id: $lcdId})-[rel:${REL.DEFINES}]->(d:${NODE.DENIAL_REASON})
+    WHERE NOT d.id IN $denialReasonIds
+    DELETE rel
+    `,
+    { lcdId: lcd.id, denialReasonIds: (lcd.denialReasons ?? []).map((reason) => reason.id) },
+  );
+}
+
+async function cleanupStaleAppliesTo(graph: Graph, lcd: LcdInput): Promise<void> {
+  await graph.run(
+    `
+    MATCH (lcd:${NODE.LCD} {id: $lcdId})-[:${REL.DEFINES}]->(d:${NODE.DENIAL_REASON})-[rel:${REL.APPLIES_TO}]->(c:${NODE.CODE})
+    WHERE NOT any(pair IN $pairs WHERE pair.denialReasonId = d.id AND pair.system = c.system AND pair.code = c.code)
+    DELETE rel
+    `,
+    {
+      lcdId: lcd.id,
+      pairs: (lcd.denialReasons ?? []).flatMap((dr) =>
+        dr.appliesTo.map((code) => ({ denialReasonId: dr.id, system: code.system, code: code.code })),
+      ),
+    },
   );
 }
 
