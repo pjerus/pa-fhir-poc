@@ -240,6 +240,21 @@ test('re-loading with a changed denial set removes stale DEFINES and APPLIES_TO 
   assert.equal(Number(applies[0]?.n ?? -1), 0);
 });
 
+test('re-loading with denialReasons absent removes all stale LCD-anchored denial edges', async () => {
+  await cleanupTestData();
+  await loadSubgraph(graph, { lcd: cignaLcdFixture() });
+  const { denialReasons: _dropped, ...withoutDenials } = cignaLcdFixture();
+  await loadSubgraph(graph, { lcd: withoutDenials });
+  const defines = await graph.run(`
+    MATCH (:LCD {id: 'TEST-W-CIG1'})-[r:DEFINES]->() RETURN count(r) AS n
+  `);
+  assert.equal(Number(defines[0]?.n ?? -1), 0);
+  const applies = await graph.run(`
+    MATCH (:DenialReason {id: 'TEST-W-CIG1-D1'})-[r:APPLIES_TO]->() RETURN count(r) AS n
+  `);
+  assert.equal(Number(applies[0]?.n ?? -1), 0);
+});
+
 test('loadSubgraph removes stale COVERS/LISTS/DEFINES edges when codes and denial reasons are dropped', async () => {
   await cleanupTestData();
   await loadSubgraph(graph, { lcd: lcdFixture(), article: articleFixture() });

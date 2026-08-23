@@ -24,11 +24,15 @@ export async function loadSubgraph(graph: Graph, input: LoadSubgraphInput): Prom
   if (lcd.denialReasons !== undefined) {
     await upsertLcdDenialReasons(graph, lcd);
     await upsertAppliesTo(graph, lcd);
-    // Order matters: stale APPLIES_TO edges are found by walking DEFINES, so
-    // they must be cleaned while the stale DEFINES edges still exist.
-    await cleanupStaleAppliesTo(graph, lcd);
-    await cleanupStaleLcdDefines(graph, lcd);
   }
+  // Cleanups run unconditionally: a re-extraction that yields zero denial
+  // reasons omits the key entirely, and stale LCD-anchored edges must not
+  // survive that load. For MAC LCDs (which never acquire LCD-anchored
+  // DEFINES) both are no-ops.
+  // Order matters: stale APPLIES_TO edges are found by walking DEFINES, so
+  // they must be cleaned while the stale DEFINES edges still exist.
+  await cleanupStaleAppliesTo(graph, lcd);
+  await cleanupStaleLcdDefines(graph, lcd);
 
   if (article !== undefined) {
     await upsertArticle(graph, lcd.id, article);

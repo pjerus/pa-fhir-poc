@@ -150,6 +150,22 @@ test('article-sourced denial reasons appear in the same top-level list', async (
   assert.ok(!('denialReasons' in (subgraph.article ?? {})));
 });
 
+test('denialReasons are ordered by numeric suffix, not lexically', async () => {
+  await cleanupTestData();
+  await graph.run(`
+    CREATE (lcd:LCD {id: 'TEST-R-ORD1', status: 'draft', sourceHash: 'TEST-R-h4'})
+    CREATE (d2:DenialReason {id: 'TEST-R-ORD1-D2', text: 'Reason two.'})
+    CREATE (d10:DenialReason {id: 'TEST-R-ORD1-D10', text: 'Reason ten.'})
+    CREATE (lcd)-[:DEFINES]->(d10)
+    CREATE (lcd)-[:DEFINES]->(d2)
+  `);
+  const subgraph = await readSubgraph(graph, 'TEST-R-ORD1');
+  assert.deepEqual(
+    subgraph.denialReasons.map((d) => d.id),
+    ['TEST-R-ORD1-D2', 'TEST-R-ORD1-D10'],
+  );
+});
+
 test('readApprovedSubgraph throws when the LCD is absent', async () => {
   await cleanupTestData();
 

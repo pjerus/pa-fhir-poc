@@ -97,7 +97,7 @@ export async function readSubgraph(graph: Graph, lcdId: string): Promise<Approve
     WHERE src = lcd OR src = a
     OPTIONAL MATCH (d)-[:${REL.APPLIES_TO}]->(c:${NODE.CODE})
     RETURN properties(d) AS d, [x IN collect(c) | {system: x.system, code: x.code}] AS appliesTo
-    ORDER BY d.id
+    ORDER BY toInteger(split(d.id, '-D')[-1]), d.id
     `,
     { lcdId },
   );
